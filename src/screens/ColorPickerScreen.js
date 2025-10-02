@@ -1,4 +1,4 @@
-import React, {useState} from 'react';
+import React, {useState, useEffect} from 'react';
 import {
   View,
   Text,
@@ -6,20 +6,43 @@ import {
   TouchableOpacity,
   Dimensions,
   ScrollView,
+  Alert,
+  StatusBar,
 } from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import {useNavigation} from '@react-navigation/native';
+import BluetoothService from '../services/BluetoothService';
+import {ErrorHandler} from '../utils/ErrorHandler';
+import logger from '../utils/Logger';
 
 const {width} = Dimensions.get('window');
 
 const ColorPickerScreen = ({navigation}) => {
   const [selectedColor, setSelectedColor] = useState('#00ff88');
+  const [isConnected, setIsConnected] = useState(false);
 
   const predefinedColors = [
-    '#ff0000', '#ff8000', '#ffff00', '#80ff00', '#00ff00',
-    '#00ff80', '#00ffff', '#0080ff', '#0000ff', '#8000ff',
-    '#ff00ff', '#ff0080', '#ffffff', '#ff8080', '#80ff80',
-    '#8080ff', '#ffff80', '#ff80ff', '#80ffff', '#000000',
+    '#ff0000',
+    '#ff8000',
+    '#ffff00',
+    '#80ff00',
+    '#00ff00',
+    '#00ff80',
+    '#00ffff',
+    '#0080ff',
+    '#0000ff',
+    '#8000ff',
+    '#ff00ff',
+    '#ff0080',
+    '#ffffff',
+    '#ff8080',
+    '#80ff80',
+    '#8080ff',
+    '#ffff80',
+    '#ff80ff',
+    '#80ffff',
+    '#000000',
   ];
 
   const colorPresets = [
@@ -55,34 +78,100 @@ const ColorPickerScreen = ({navigation}) => {
     },
   ];
 
-  const handleColorSelect = (color) => {
+  useEffect(() => {
+    // Check connection status
+    const status = BluetoothService.getConnectionStatus();
+    setIsConnected(status.isConnected);
+
+    // Listen for connection changes
+    const handleConnectionChange = device => {
+      setIsConnected(true);
+    };
+
+    const handleDisconnection = () => {
+      setIsConnected(false);
+    };
+
+    BluetoothService.addListener('connected', handleConnectionChange);
+    BluetoothService.addListener('disconnected', handleDisconnection);
+
+    return () => {
+      BluetoothService.removeListener('connected', handleConnectionChange);
+      BluetoothService.removeListener('disconnected', handleDisconnection);
+    };
+  }, []);
+
+  const handleColorSelect = async color => {
     setSelectedColor(color);
-    // Here you would send the color command to your LED device
-    console.log('Color selected:', color);
+    
+    if (!isConnected) {
+      Alert.alert('Not Connected', 'Please connect to a LED device first');
+      return;
+    }
+
+    try {
+      logger.info('Setting LED color', {color});
+      const success = await BluetoothService.setColor(color);
+      
+      if (success) {
+        Alert.alert('Success', 'Color applied to LED device!');
+        logger.info('Color successfully applied to LED device');
+      } else {
+        throw new Error('Failed to apply color');
+      }
+    } catch (error) {
+      logger.error('Error applying color to LED device', error);
+      const userMessage = ErrorHandler.getUserFriendlyMessage(error);
+      Alert.alert('Error', userMessage);
+    }
   };
 
-  const handlePresetSelect = (preset) => {
+  const handlePresetSelect = async preset => {
     setSelectedColor(preset.colors[0]);
-    // Here you would send the preset command to your LED device
-    console.log('Preset selected:', preset.name);
+    
+    if (!isConnected) {
+      Alert.alert('Not Connected', 'Please connect to a LED device first');
+      return;
+    }
+
+    try {
+      logger.info('Applying color preset', {preset: preset.name});
+      const success = await BluetoothService.setPreset(preset.name);
+      
+      if (success) {
+        Alert.alert('Success', `${preset.name} preset applied!`);
+        logger.info('Color preset successfully applied');
+      } else {
+        throw new Error('Failed to apply preset');
+      }
+    } catch (error) {
+      logger.error('Error applying preset', error);
+      const userMessage = ErrorHandler.getUserFriendlyMessage(error);
+      Alert.alert('Error', userMessage);
+    }
   };
 
   const handleApply = () => {
-    // Apply the selected color
     navigation.goBack();
   };
 
   return (
     <View style={styles.container}>
+      <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
+      
+      {/* Connection Status */}
+      <View style={styles.statusContainer}>
+        <View style={[styles.statusIndicator, {backgroundColor: isConnected ? '#00ff88' : '#ff4444'}]} />
+        <Text style={styles.statusText}>
+          {isConnected ? 'Connected' : 'Not Connected'}
+        </Text>
+      </View>
+
       {/* Current Color Preview */}
       <View style={styles.previewContainer}>
-        <View 
-          style={[
-            styles.colorPreview,
-            {backgroundColor: selectedColor}
-          ]}
-        />
+        <View style={[styles.colorPreview, {backgroundColor: selectedColor}]} />
         <Text style={styles.previewText}>Selected Color</Text>
+        <Text style={styles.colorCode}>{selectedColor}</Text>
       </View>
 
       <ScrollView style={styles.scrollContainer}>
@@ -96,7 +185,7 @@ const ColorPickerScreen = ({navigation}) => {
                 style={[
                   styles.colorButton,
                   {backgroundColor: color},
-                  selectedColor === color && styles.selectedColorButton
+                  selectedColor === color && styles.selectedColorButton,
                 ]}
                 onPress={() => handleColorSelect(color)}
               />
@@ -138,9 +227,7 @@ const ColorPickerScreen = ({navigation}) => {
 
       {/* Apply Button */}
       <TouchableOpacity style={styles.applyButton} onPress={handleApply}>
-        <LinearGradient
-          colors={['#00ff88', '#00cc6a']}
-          style={styles.applyGradient}>
+        <LinearGradient colors={['#00ff88', '#00cc6a']} style={styles.applyGradient}>
           <Text style={styles.applyText}>Apply Color</Text>
         </LinearGradient>
       </TouchableOpacity>
@@ -177,6 +264,33 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
+  },
+  colorCode: {
+    color: '#999',
+    fontSize: 14,
+    marginTop: 5,
+    fontFamily: 'monospace',
+  },
+  statusContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: '#333',
+    paddingHorizontal: 15,
+    paddingVertical: 10,
+    borderRadius: 20,
+    margin: 20,
+    alignSelf: 'flex-start',
+  },
+  statusIndicator: {
+    width: 8,
+    height: 8,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  statusText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: '500',
   },
   scrollContainer: {
     flex: 1,

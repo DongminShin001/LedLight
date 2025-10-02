@@ -143,6 +143,12 @@ const HomeScreen = () => {
           <Icon name="favorite" size={24} color="#fff" />
           <Text style={styles.quickActionText}>Warm</Text>
         </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.quickActionButton}
+          onPress={() => navigation.navigate('TextDisplay')}>
+          <Icon name="text-fields" size={24} color="#fff" />
+          <Text style={styles.quickActionText}>Custom Text</Text>
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -271,6 +277,7 @@ const styles = StyleSheet.create({
   },
   quickActions: {
     flexDirection: 'row',
+    flexWrap: 'wrap',
     justifyContent: 'space-around',
     marginTop: 20,
   },
@@ -278,9 +285,12 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: '#333',
     paddingVertical: 15,
-    paddingHorizontal: 20,
+    paddingHorizontal: 15,
     borderRadius: 15,
     minWidth: 80,
+    marginBottom: 10,
+    flex: 1,
+    marginHorizontal: 5,
   },
   quickActionText: {
     color: '#fff',

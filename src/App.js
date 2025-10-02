@@ -10,6 +10,7 @@ import EffectsScreen from './src/screens/EffectsScreen';
 import PresetsScreen from './src/screens/PresetsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import ColorPickerScreen from './src/screens/ColorPickerScreen';
+import TextDisplayScreen from './src/screens/TextDisplayScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -27,6 +28,17 @@ function HomeStack() {
         component={ColorPickerScreen}
         options={{
           title: 'Color Picker',
+          headerStyle: {
+            backgroundColor: '#1a1a1a',
+          },
+          headerTintColor: '#fff',
+        }}
+      />
+      <Stack.Screen 
+        name="TextDisplay" 
+        component={TextDisplayScreen}
+        options={{
+          title: 'Custom Text',
           headerStyle: {
             backgroundColor: '#1a1a1a',
           },
