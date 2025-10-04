@@ -13,7 +13,8 @@ import {
 import LinearGradient from 'react-native-linear-gradient';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 import {useNavigation} from '@react-navigation/native';
-import BluetoothService from '../services/BluetoothService';
+import TextManager from '../classes/TextManager';
+import DeviceManager from '../classes/DeviceManager';
 import {ErrorHandler} from '../utils/ErrorHandler';
 import logger from '../utils/Logger';
 
@@ -28,110 +29,101 @@ const TextDisplayScreen = () => {
   const [animation, setAnimation] = useState('none');
   const [speed, setSpeed] = useState(50);
   const [isConnected, setIsConnected] = useState(false);
+  const [connectionState, setConnectionState] = useState('disconnected');
 
-  // Predefined color palettes
-  const colorPalettes = [
-    {
-      name: 'Neon',
-      colors: ['#00ff88', '#ff0080', '#00ffff', '#ffff00', '#ff8000', '#8000ff'],
-    },
-    {
-      name: 'Warm',
-      colors: ['#ff6b6b', '#ffa726', '#ffeb3b', '#ff5722', '#ff9800', '#f44336'],
-    },
-    {
-      name: 'Cool',
-      colors: ['#2196f3', '#00bcd4', '#4dd0e1', '#009688', '#4caf50', '#8bc34a'],
-    },
-    {
-      name: 'Pastel',
-      colors: ['#ffcdd2', '#f8bbd9', '#e1bee7', '#c5cae9', '#bbdefb', '#b3e5fc'],
-    },
-    {
-      name: 'Monochrome',
-      colors: ['#ffffff', '#e0e0e0', '#9e9e9e', '#616161', '#424242', '#000000'],
-    },
-    {
-      name: 'Rainbow',
-      colors: [
-        '#ff0000',
-        '#ff8000',
-        '#ffff00',
-        '#80ff00',
-        '#00ff00',
-        '#00ff80',
-        '#00ffff',
-        '#0080ff',
-        '#0000ff',
-        '#8000ff',
-        '#ff00ff',
-      ],
-    },
-  ];
+  // Get color palettes and animations from TextManager
+  const colorPalettes = TextManager.getColorPalettes
+    ? TextManager.getColorPalettes()
+    : [
+        {
+          name: 'Neon',
+          colors: ['#00ff88', '#ff0080', '#00ffff', '#ffff00', '#ff8000', '#8000ff'],
+        },
+        {
+          name: 'Warm',
+          colors: ['#ff6b6b', '#ffa726', '#ffeb3b', '#ff5722', '#ff9800', '#f44336'],
+        },
+        {
+          name: 'Cool',
+          colors: ['#2196f3', '#00bcd4', '#4dd0e1', '#009688', '#4caf50', '#8bc34a'],
+        },
+        {
+          name: 'Pastel',
+          colors: ['#ffcdd2', '#f8bbd9', '#e1bee7', '#c5cae9', '#bbdefb', '#b3e5fc'],
+        },
+        {
+          name: 'Monochrome',
+          colors: ['#ffffff', '#e0e0e0', '#9e9e9e', '#616161', '#424242', '#000000'],
+        },
+        {
+          name: 'Rainbow',
+          colors: [
+            '#ff0000',
+            '#ff8000',
+            '#ffff00',
+            '#80ff00',
+            '#00ff00',
+            '#00ff80',
+            '#00ffff',
+            '#0080ff',
+            '#0000ff',
+            '#8000ff',
+            '#ff00ff',
+          ],
+        },
+      ];
 
-  const animations = [
-    {id: 'none', name: 'Static', icon: 'text-fields'},
-    {id: 'scroll', name: 'Scroll', icon: 'swap-horiz'},
-    {id: 'blink', name: 'Blink', icon: 'flash-on'},
-    {id: 'fade', name: 'Fade', icon: 'opacity'},
-    {id: 'rainbow', name: 'Rainbow', icon: 'palette'},
-    {id: 'wave', name: 'Wave', icon: 'waves'},
-  ];
+  const animations = TextManager.getAvailableAnimations();
 
   useEffect(() => {
+    // Initialize TextManager with current values
+    TextManager.setText(customText);
+    TextManager.setTextColor(textColor);
+    TextManager.setBackgroundColor(backgroundColor);
+    TextManager.setTextSize(textSize);
+    TextManager.setAnimation(animation);
+    TextManager.setSpeed(speed);
+
     // Check connection status
-    const status = BluetoothService.getConnectionStatus();
-    setIsConnected(status.isConnected);
+    const connected = DeviceManager.isDeviceConnected();
+    const state = DeviceManager.getConnectionState();
+    setIsConnected(connected);
+    setConnectionState(state);
 
     // Listen for connection changes
     const handleConnectionChange = device => {
       setIsConnected(true);
+      setConnectionState('connected');
+      logger.info('Device connected in TextDisplayScreen', {device: device.name});
     };
 
     const handleDisconnection = () => {
       setIsConnected(false);
+      setConnectionState('disconnected');
+      logger.info('Device disconnected in TextDisplayScreen');
     };
 
-    BluetoothService.addListener('connected', handleConnectionChange);
-    BluetoothService.addListener('disconnected', handleDisconnection);
+    DeviceManager.addListener('deviceConnected', handleConnectionChange);
+    DeviceManager.addListener('deviceDisconnected', handleDisconnection);
 
     return () => {
-      BluetoothService.removeListener('connected', handleConnectionChange);
-      BluetoothService.removeListener('disconnected', handleDisconnection);
+      DeviceManager.removeListener('deviceConnected', handleConnectionChange);
+      DeviceManager.removeListener('deviceDisconnected', handleDisconnection);
     };
   }, []);
 
   const handleSendText = async () => {
-    if (!customText.trim()) {
-      Alert.alert('Error', 'Please enter some text to display');
-      return;
-    }
-
-    if (!isConnected) {
-      Alert.alert('Not Connected', 'Please connect to a LED device first');
-      return;
-    }
-
     try {
-      logger.info('Sending custom text to LED device', {
-        text: customText,
-        color: textColor,
-        backgroundColor,
-        size: textSize,
-        animation,
-        speed,
-      });
+      // Update TextManager with current values
+      TextManager.setText(customText);
+      TextManager.setTextColor(textColor);
+      TextManager.setBackgroundColor(backgroundColor);
+      TextManager.setTextSize(textSize);
+      TextManager.setAnimation(animation);
+      TextManager.setSpeed(speed);
 
-      // Send text display command
-      const command = `TEXT:${customText}|COLOR:${textColor.replace(
-        '#',
-        '',
-      )}|BG:${backgroundColor.replace(
-        '#',
-        '',
-      )}|SIZE:${textSize}|ANIM:${animation}|SPEED:${speed}\n`;
-
-      const success = await BluetoothService.sendCommand(command);
+      // Send text to LED device using TextManager
+      const success = await TextManager.sendToLED();
 
       if (success) {
         Alert.alert('Success', 'Text sent to LED device!');
