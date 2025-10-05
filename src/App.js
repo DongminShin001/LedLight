@@ -5,12 +5,12 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Import screens
-import HomeScreen from './src/screens/HomeScreen';
+import EnhancedHomeScreen from './src/screens/EnhancedHomeScreen';
 import EffectsScreen from './src/screens/EffectsScreen';
 import PresetsScreen from './src/screens/PresetsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
-import ColorPickerScreen from './src/screens/ColorPickerScreen';
-import TextDisplayScreen from './src/screens/TextDisplayScreen';
+import EnhancedColorPickerScreen from './src/screens/EnhancedColorPickerScreen';
+import EnhancedTextDisplayScreen from './src/screens/EnhancedTextDisplayScreen';
 
 const Tab = createBottomTabNavigator();
 const Stack = createStackNavigator();
@@ -20,30 +20,18 @@ function HomeStack() {
     <Stack.Navigator>
       <Stack.Screen 
         name="HomeMain" 
-        component={HomeScreen} 
+        component={EnhancedHomeScreen} 
         options={{headerShown: false}}
       />
       <Stack.Screen 
         name="ColorPicker" 
-        component={ColorPickerScreen}
-        options={{
-          title: 'Color Picker',
-          headerStyle: {
-            backgroundColor: '#1a1a1a',
-          },
-          headerTintColor: '#fff',
-        }}
+        component={EnhancedColorPickerScreen}
+        options={{headerShown: false}}
       />
       <Stack.Screen 
         name="TextDisplay" 
-        component={TextDisplayScreen}
-        options={{
-          title: 'Custom Text',
-          headerStyle: {
-            backgroundColor: '#1a1a1a',
-          },
-          headerTintColor: '#fff',
-        }}
+        component={EnhancedTextDisplayScreen}
+        options={{headerShown: false}}
       />
     </Stack.Navigator>
   );
