@@ -1,7 +1,7 @@
 {
-  "name": "LedLight",
+  "name": "SmartLED Controller",
   "version": "1.0.0",
-  "description": "A modern LED light control mobile app",
+  "description": "Professional LED lighting control app for smart home and commercial lighting systems",
   "main": "index.js",
   "scripts": {
     "android": "react-native run-android",
@@ -104,12 +104,20 @@
   },
   "keywords": [
     "react-native",
-    "led",
+    "led-controller",
+    "smart-lighting",
     "bluetooth",
     "mobile",
     "iot",
-    "smart-lighting"
+    "home-automation",
+    "commercial-lighting",
+    "rgb-lighting",
+    "led-effects"
   ],
-  "author": "Your Name",
-  "license": "MIT"
+  "author": "SmartLED Technologies",
+  "license": "MIT",
+  "homepage": "https://smartled-controller.com",
+  "bugs": {
+    "url": "https://github.com/smartled-controller/issues"
+  }
 }

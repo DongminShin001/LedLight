@@ -164,7 +164,7 @@ const HomeScreen = () => {
 
       {/* Header */}
       <View style={styles.header}>
-        <Text style={styles.title}>LED Controller</Text>
+        <Text style={styles.title}>SmartLED Controller</Text>
         <TouchableOpacity
           style={[styles.connectButton, isConnected && styles.connectedButton]}
           onPress={handleConnect}>
