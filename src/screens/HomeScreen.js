@@ -250,6 +250,78 @@ const HomeScreen = () => {
           <Text style={styles.quickActionText}>Custom Text</Text>
         </TouchableOpacity>
       </View>
+
+      {/* Advanced Features */}
+      <View style={styles.advancedFeatures}>
+        <Text style={styles.advancedTitle}>Advanced Features</Text>
+        <View style={styles.featureGrid}>
+          <TouchableOpacity
+            style={styles.featureButton}
+            onPress={() => navigation.navigate('AdvancedEffects')}>
+            <LinearGradient
+              colors={['#ff6b6b', '#ff8e8e']}
+              style={styles.featureGradient}>
+              <Icon name="auto-awesome" size={32} color="#fff" />
+              <Text style={styles.featureText}>Advanced Effects</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.featureButton}
+            onPress={() => navigation.navigate('MusicReactive')}>
+            <LinearGradient
+              colors={['#4ecdc4', '#44a08d']}
+              style={styles.featureGradient}>
+              <Icon name="music-note" size={32} color="#fff" />
+              <Text style={styles.featureText}>Music Reactive</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.featureButton}
+            onPress={() => navigation.navigate('Scheduling')}>
+            <LinearGradient
+              colors={['#45b7d1', '#96c93d']}
+              style={styles.featureGradient}>
+              <Icon name="schedule" size={32} color="#fff" />
+              <Text style={styles.featureText}>Scheduling</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.featureButton}
+            onPress={() => navigation.navigate('DeviceManagement')}>
+            <LinearGradient
+              colors={['#f093fb', '#f5576c']}
+              style={styles.featureGradient}>
+              <Icon name="devices" size={32} color="#fff" />
+              <Text style={styles.featureText}>Device Management</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.featureButton}
+            onPress={() => navigation.navigate('Analytics')}>
+            <LinearGradient
+              colors={['#4facfe', '#00f2fe']}
+              style={styles.featureGradient}>
+              <Icon name="analytics" size={32} color="#fff" />
+              <Text style={styles.featureText}>Analytics</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={styles.featureButton}
+            onPress={() => navigation.navigate('ColorPicker')}>
+            <LinearGradient
+              colors={['#fa709a', '#fee140']}
+              style={styles.featureGradient}>
+              <Icon name="palette" size={32} color="#fff" />
+              <Text style={styles.featureText}>Color Picker</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+        </View>
+      </View>
     </View>
   );
 };
@@ -396,6 +468,41 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 12,
     marginTop: 5,
+  },
+  advancedFeatures: {
+    marginTop: 30,
+    marginBottom: 20,
+  },
+  advancedTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 15,
+    textAlign: 'center',
+  },
+  featureGrid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'space-between',
+  },
+  featureButton: {
+    width: (width - 60) / 2,
+    marginBottom: 15,
+    borderRadius: 15,
+    overflow: 'hidden',
+  },
+  featureGradient: {
+    padding: 20,
+    alignItems: 'center',
+    justifyContent: 'center',
+    minHeight: 100,
+  },
+  featureText: {
+    color: '#fff',
+    fontSize: 14,
+    fontWeight: 'bold',
+    marginTop: 8,
+    textAlign: 'center',
   },
 });
 

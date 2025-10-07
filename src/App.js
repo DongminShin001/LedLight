@@ -5,8 +5,14 @@ import {createStackNavigator} from '@react-navigation/stack';
 import Icon from 'react-native-vector-icons/MaterialIcons';
 
 // Import screens
+import HomeScreen from './src/screens/HomeScreen';
 import EnhancedHomeScreen from './src/screens/EnhancedHomeScreen';
 import EffectsScreen from './src/screens/EffectsScreen';
+import AdvancedEffectsScreen from './src/screens/AdvancedEffectsScreen';
+import MusicReactiveScreen from './src/screens/MusicReactiveScreen';
+import SchedulingScreen from './src/screens/SchedulingScreen';
+import DeviceManagementScreen from './src/screens/DeviceManagementScreen';
+import AnalyticsScreen from './src/screens/AnalyticsScreen';
 import PresetsScreen from './src/screens/PresetsScreen';
 import SettingsScreen from './src/screens/SettingsScreen';
 import EnhancedColorPickerScreen from './src/screens/EnhancedColorPickerScreen';
@@ -20,7 +26,7 @@ function HomeStack() {
     <Stack.Navigator>
       <Stack.Screen 
         name="HomeMain" 
-        component={EnhancedHomeScreen} 
+        component={HomeScreen} 
         options={{headerShown: false}}
       />
       <Stack.Screen 
@@ -31,6 +37,31 @@ function HomeStack() {
       <Stack.Screen 
         name="TextDisplay" 
         component={EnhancedTextDisplayScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name="AdvancedEffects" 
+        component={AdvancedEffectsScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name="MusicReactive" 
+        component={MusicReactiveScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name="Scheduling" 
+        component={SchedulingScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name="DeviceManagement" 
+        component={DeviceManagementScreen}
+        options={{headerShown: false}}
+      />
+      <Stack.Screen 
+        name="Analytics" 
+        component={AnalyticsScreen}
         options={{headerShown: false}}
       />
     </Stack.Navigator>
