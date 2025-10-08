@@ -529,7 +529,7 @@ const DeviceManagementScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#0f0f0f',
   },
   header: {
     flexDirection: 'row',
@@ -648,10 +648,15 @@ const styles = StyleSheet.create({
     padding: 5,
   },
   deviceCard: {
-    backgroundColor: '#333',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 15,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 20,
+    padding: 24,
+    marginBottom: 16,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   deviceHeader: {
     flexDirection: 'row',

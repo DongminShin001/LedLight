@@ -366,13 +366,13 @@ const AnalyticsScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#0f0f0f',
   },
   loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#0f0f0f',
   },
   loadingText: {
     fontSize: 18,
@@ -490,9 +490,14 @@ const styles = StyleSheet.create({
     opacity: 0.8,
   },
   statsContainer: {
-    backgroundColor: '#333',
-    borderRadius: 15,
-    padding: 20,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   statCard: {
     flexDirection: 'row',

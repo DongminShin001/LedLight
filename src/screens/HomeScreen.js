@@ -258,64 +258,52 @@ const HomeScreen = () => {
           <TouchableOpacity
             style={styles.featureButton}
             onPress={() => navigation.navigate('AdvancedEffects')}>
-            <LinearGradient
-              colors={['#ff6b6b', '#ff8e8e']}
-              style={styles.featureGradient}>
+            <LinearGradient colors={['#ff6b6b', '#ff8e8e']} style={styles.featureGradient}>
               <Icon name="auto-awesome" size={32} color="#fff" />
               <Text style={styles.featureText}>Advanced Effects</Text>
             </LinearGradient>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={styles.featureButton}
             onPress={() => navigation.navigate('MusicReactive')}>
-            <LinearGradient
-              colors={['#4ecdc4', '#44a08d']}
-              style={styles.featureGradient}>
+            <LinearGradient colors={['#4ecdc4', '#44a08d']} style={styles.featureGradient}>
               <Icon name="music-note" size={32} color="#fff" />
               <Text style={styles.featureText}>Music Reactive</Text>
             </LinearGradient>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={styles.featureButton}
             onPress={() => navigation.navigate('Scheduling')}>
-            <LinearGradient
-              colors={['#45b7d1', '#96c93d']}
-              style={styles.featureGradient}>
+            <LinearGradient colors={['#45b7d1', '#96c93d']} style={styles.featureGradient}>
               <Icon name="schedule" size={32} color="#fff" />
               <Text style={styles.featureText}>Scheduling</Text>
             </LinearGradient>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={styles.featureButton}
             onPress={() => navigation.navigate('DeviceManagement')}>
-            <LinearGradient
-              colors={['#f093fb', '#f5576c']}
-              style={styles.featureGradient}>
+            <LinearGradient colors={['#f093fb', '#f5576c']} style={styles.featureGradient}>
               <Icon name="devices" size={32} color="#fff" />
               <Text style={styles.featureText}>Device Management</Text>
             </LinearGradient>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={styles.featureButton}
             onPress={() => navigation.navigate('Analytics')}>
-            <LinearGradient
-              colors={['#4facfe', '#00f2fe']}
-              style={styles.featureGradient}>
+            <LinearGradient colors={['#4facfe', '#00f2fe']} style={styles.featureGradient}>
               <Icon name="analytics" size={32} color="#fff" />
               <Text style={styles.featureText}>Analytics</Text>
             </LinearGradient>
           </TouchableOpacity>
-          
+
           <TouchableOpacity
             style={styles.featureButton}
             onPress={() => navigation.navigate('ColorPicker')}>
-            <LinearGradient
-              colors={['#fa709a', '#fee140']}
-              style={styles.featureGradient}>
+            <LinearGradient colors={['#fa709a', '#fee140']} style={styles.featureGradient}>
               <Icon name="palette" size={32} color="#fff" />
               <Text style={styles.featureText}>Color Picker</Text>
             </LinearGradient>
@@ -329,7 +317,7 @@ const HomeScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#0f0f0f',
     paddingHorizontal: 20,
   },
   header: {
@@ -337,25 +325,33 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     paddingTop: 20,
-    paddingBottom: 20,
+    paddingBottom: 30,
   },
   title: {
-    fontSize: 28,
-    fontWeight: 'bold',
+    fontSize: 32,
+    fontWeight: '800',
     color: '#fff',
+    letterSpacing: -0.5,
   },
   connectButton: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#333',
-    paddingHorizontal: 15,
-    paddingVertical: 8,
-    borderRadius: 20,
+    backgroundColor: '#1a1a1a',
+    paddingHorizontal: 16,
+    paddingVertical: 10,
+    borderRadius: 25,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   connectedButton: {
-    backgroundColor: '#00ff8820',
-    borderWidth: 1,
+    backgroundColor: '#00ff8815',
+    borderWidth: 2,
     borderColor: '#00ff88',
+    shadowColor: '#00ff88',
+    shadowOpacity: 0.4,
   },
   connectText: {
     color: '#fff',
@@ -367,118 +363,159 @@ const styles = StyleSheet.create({
   },
   ledPreview: {
     alignItems: 'center',
-    marginVertical: 30,
+    marginVertical: 40,
   },
   ledCircle: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 15,
+    width: 140,
+    height: 140,
+    borderRadius: 70,
+    marginBottom: 20,
     shadowColor: '#00ff88',
     shadowOffset: {
       width: 0,
       height: 0,
     },
-    shadowOpacity: 0.5,
-    shadowRadius: 20,
-    elevation: 10,
+    shadowOpacity: 0.6,
+    shadowRadius: 30,
+    elevation: 15,
   },
   statusText: {
-    fontSize: 18,
-    fontWeight: 'bold',
+    fontSize: 20,
+    fontWeight: '700',
     color: '#fff',
+    letterSpacing: 1,
   },
   powerButton: {
-    width: 80,
-    height: 80,
-    borderRadius: 40,
-    backgroundColor: '#333',
+    width: 90,
+    height: 90,
+    borderRadius: 45,
+    backgroundColor: '#1a1a1a',
     justifyContent: 'center',
     alignItems: 'center',
     alignSelf: 'center',
-    marginVertical: 20,
+    marginVertical: 30,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 6},
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 12,
   },
   powerButtonOn: {
     backgroundColor: '#00ff88',
+    shadowColor: '#00ff88',
+    shadowOpacity: 0.6,
   },
   brightnessContainer: {
-    marginVertical: 20,
+    marginVertical: 30,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 20,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   brightnessLabel: {
-    fontSize: 16,
+    fontSize: 18,
+    fontWeight: '600',
     color: '#fff',
-    marginBottom: 10,
+    marginBottom: 15,
     textAlign: 'center',
+    letterSpacing: 0.5,
   },
   sliderContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 20,
+    paddingHorizontal: 10,
   },
   slider: {
     flex: 1,
-    marginHorizontal: 15,
+    marginHorizontal: 20,
   },
   sliderThumb: {
     backgroundColor: '#00ff88',
-    width: 20,
-    height: 20,
+    width: 24,
+    height: 24,
+    shadowColor: '#00ff88',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.5,
+    shadowRadius: 4,
+    elevation: 4,
   },
   brightnessValue: {
-    fontSize: 16,
+    fontSize: 20,
     color: '#00ff88',
     textAlign: 'center',
-    marginTop: 10,
-    fontWeight: 'bold',
+    marginTop: 15,
+    fontWeight: '700',
+    letterSpacing: 1,
   },
   colorButton: {
-    marginVertical: 20,
+    marginVertical: 30,
+    borderRadius: 25,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   colorGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 15,
+    paddingVertical: 18,
     borderRadius: 25,
   },
   colorButtonText: {
     color: '#fff',
-    fontSize: 16,
-    fontWeight: 'bold',
-    marginLeft: 10,
+    fontSize: 18,
+    fontWeight: '700',
+    marginLeft: 12,
+    letterSpacing: 0.5,
   },
   quickActions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    justifyContent: 'space-around',
-    marginTop: 20,
-  },
-  quickActionButton: {
-    alignItems: 'center',
-    backgroundColor: '#333',
-    paddingVertical: 15,
-    paddingHorizontal: 15,
-    borderRadius: 15,
-    minWidth: 80,
-    marginBottom: 10,
-    flex: 1,
-    marginHorizontal: 5,
-  },
-  quickActionText: {
-    color: '#fff',
-    fontSize: 12,
-    marginTop: 5,
-  },
-  advancedFeatures: {
+    justifyContent: 'space-between',
     marginTop: 30,
     marginBottom: 20,
   },
-  advancedTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
+  quickActionButton: {
+    alignItems: 'center',
+    backgroundColor: '#1a1a1a',
+    paddingVertical: 18,
+    paddingHorizontal: 16,
+    borderRadius: 18,
+    minWidth: 85,
+    marginBottom: 12,
+    flex: 1,
+    marginHorizontal: 4,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
+  },
+  quickActionText: {
     color: '#fff',
-    marginBottom: 15,
+    fontSize: 13,
+    marginTop: 6,
+    fontWeight: '600',
+    letterSpacing: 0.3,
+  },
+  advancedFeatures: {
+    marginTop: 40,
+    marginBottom: 30,
+  },
+  advancedTitle: {
+    fontSize: 24,
+    fontWeight: '700',
+    color: '#fff',
+    marginBottom: 20,
     textAlign: 'center',
+    letterSpacing: 0.5,
   },
   featureGrid: {
     flexDirection: 'row',
@@ -487,22 +524,28 @@ const styles = StyleSheet.create({
   },
   featureButton: {
     width: (width - 60) / 2,
-    marginBottom: 15,
-    borderRadius: 15,
+    marginBottom: 16,
+    borderRadius: 20,
     overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 6},
+    shadowOpacity: 0.4,
+    shadowRadius: 12,
+    elevation: 12,
   },
   featureGradient: {
-    padding: 20,
+    padding: 24,
     alignItems: 'center',
     justifyContent: 'center',
-    minHeight: 100,
+    minHeight: 120,
   },
   featureText: {
     color: '#fff',
-    fontSize: 14,
-    fontWeight: 'bold',
-    marginTop: 8,
+    fontSize: 15,
+    fontWeight: '700',
+    marginTop: 10,
     textAlign: 'center',
+    letterSpacing: 0.3,
   },
 });
 

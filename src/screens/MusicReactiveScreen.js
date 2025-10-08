@@ -342,7 +342,7 @@ const MusicReactiveScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1a1a1a',
+    backgroundColor: '#0f0f0f',
   },
   header: {
     flexDirection: 'row',
@@ -391,26 +391,32 @@ const styles = StyleSheet.create({
     marginBottom: 15,
   },
   visualizerContainer: {
-    backgroundColor: '#333',
-    borderRadius: 15,
-    padding: 20,
+    backgroundColor: '#1a1a1a',
+    borderRadius: 20,
+    padding: 24,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 4},
+    shadowOpacity: 0.3,
+    shadowRadius: 8,
+    elevation: 8,
   },
   visualizerBar: {
-    height: 20,
-    borderRadius: 10,
+    height: 24,
+    borderRadius: 12,
     overflow: 'hidden',
-    marginBottom: 10,
+    marginBottom: 15,
   },
   visualizerLevel: {
     height: '100%',
-    backgroundColor: 'rgba(255, 255, 255, 0.3)',
-    borderRadius: 10,
+    backgroundColor: 'rgba(255, 255, 255, 0.4)',
+    borderRadius: 12,
   },
   audioLevelText: {
-    fontSize: 24,
-    fontWeight: 'bold',
+    fontSize: 28,
+    fontWeight: '800',
     color: '#00ff88',
     textAlign: 'center',
+    letterSpacing: 1,
   },
   modesSection: {
     marginBottom: 30,
