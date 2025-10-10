@@ -8,11 +8,13 @@ import LEDController from '../classes/LEDController';
 import DeviceManager from '../classes/DeviceManager';
 import {ErrorHandler} from '../utils/ErrorHandler';
 import logger from '../utils/Logger';
+import {useTheme} from '../hooks/useTheme';
 
 const {width, height} = Dimensions.get('window');
 
 const HomeScreen = () => {
   const navigation = useNavigation();
+  const {theme, isLoading: themeLoading} = useTheme();
   const [isConnected, setIsConnected] = useState(false);
   const [brightness, setBrightness] = useState(50);
   const [isOn, setIsOn] = useState(false);
@@ -158,9 +160,18 @@ const HomeScreen = () => {
     }
   };
 
+  if (themeLoading) {
+    return (
+      <View style={[styles.loadingContainer, {backgroundColor: theme.colors.background}]}>
+        <Icon name="palette" size={64} color={theme.colors.primary} />
+        <Text style={[styles.loadingText, {color: theme.colors.text}]}>Loading...</Text>
+      </View>
+    );
+  }
+
   return (
-    <View style={styles.container}>
-      <StatusBar barStyle="light-content" backgroundColor="#1a1a1a" />
+    <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.surface} />
 
       {/* Header */}
       <View style={styles.header}>
@@ -306,6 +317,15 @@ const HomeScreen = () => {
             <LinearGradient colors={['#fa709a', '#fee140']} style={styles.featureGradient}>
               <Icon name="palette" size={32} color="#fff" />
               <Text style={styles.featureText}>Color Picker</Text>
+            </LinearGradient>
+          </TouchableOpacity>
+
+          <TouchableOpacity
+            style={styles.featureButton}
+            onPress={() => navigation.navigate('ThemeSelection')}>
+            <LinearGradient colors={['#667eea', '#764ba2']} style={styles.featureGradient}>
+              <Icon name="color-lens" size={32} color="#fff" />
+              <Text style={styles.featureText}>Themes</Text>
             </LinearGradient>
           </TouchableOpacity>
         </View>
