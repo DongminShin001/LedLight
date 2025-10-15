@@ -21,6 +21,7 @@ import AnalyticsScreen from '../screens/AnalyticsScreen';
 import ThemeSelectionScreen from '../screens/ThemeSelectionScreen';
 import EnhancedColorPickerScreen from '../screens/EnhancedColorPickerScreen';
 import EnhancedTextDisplayScreen from '../screens/EnhancedTextDisplayScreen';
+import LegalAgreementScreen from '../screens/LegalAgreementScreen';
 
 import logger from '../utils/Logger';
 
@@ -37,6 +38,7 @@ export class App extends Component {
       error: null,
       theme: null,
       isInitialized: false,
+      legalAgreementsAccepted: false,
     };
 
     // Initialize managers
@@ -73,10 +75,13 @@ export class App extends Component {
     try {
       logger.info('Initializing application...');
 
+      // Check if legal agreements have been accepted
+      const agreementsAccepted = await this.checkLegalAgreements();
+
       // Initialize theme manager
       await this.themeManager.initialize();
       const currentTheme = this.themeManager.getCurrentTheme();
-
+      
       // Set theme for navigation managers
       this.navigationManager.setTheme(currentTheme);
       this.stackManager.setTheme(currentTheme);
@@ -92,11 +97,13 @@ export class App extends Component {
         isLoading: false,
         theme: currentTheme,
         isInitialized: true,
+        legalAgreementsAccepted: agreementsAccepted,
       });
 
       logger.info('Application initialized successfully', {
         themeId: currentTheme.getId(),
         screenCount: this.screenManager.getAllScreens().size,
+        agreementsAccepted,
       });
     } catch (error) {
       logger.error('Failed to initialize application', error);
@@ -192,6 +199,37 @@ export class App extends Component {
   }
 
   /**
+   * Check if legal agreements have been accepted
+   */
+  async checkLegalAgreements() {
+    try {
+      // In a real app, you would check AsyncStorage or a secure storage
+      // For now, we'll return false to always show the agreement screen
+      return false;
+    } catch (error) {
+      logger.error('Failed to check legal agreements', error);
+      return false;
+    }
+  }
+
+  /**
+   * Handle legal agreement acceptance
+   */
+  handleLegalAgreementAccept = (agreementData) => {
+    logger.info('Legal agreements accepted', agreementData);
+    this.setState({legalAgreementsAccepted: true});
+  };
+
+  /**
+   * Handle legal agreement decline
+   */
+  handleLegalAgreementDecline = () => {
+    logger.info('Legal agreements declined');
+    // In a real app, you might want to exit the app or show a different screen
+    this.setState({legalAgreementsAccepted: false});
+  };
+
+  /**
    * Handle theme change
    * @param {Theme} newTheme - New theme instance
    */
@@ -275,7 +313,7 @@ export class App extends Component {
     const primaryColor = theme?.colors.primary || '#00ff88';
     const textColor = theme?.colors.text || '#fff';
 
-    return (
+  return (
       <View style={[styles.loadingContainer, {backgroundColor}]}>
         <Icon name="palette" size={64} color={primaryColor} />
         <Text style={[styles.loadingText, {color: textColor}]}>
@@ -296,7 +334,7 @@ export class App extends Component {
     const errorColor = theme?.colors.error || '#ff4444';
     const textColor = theme?.colors.text || '#fff';
 
-    return (
+  return (
       <View style={[styles.errorContainer, {backgroundColor}]}>
         <Icon name="error" size={64} color={errorColor} />
         <Text style={[styles.errorTitle, {color: textColor}]}>Application Error</Text>
@@ -315,16 +353,16 @@ export class App extends Component {
     return (
       <NavigationContainer>
         <MainTabs />
-      </NavigationContainer>
-    );
-  }
+    </NavigationContainer>
+  );
+}
 
   /**
    * Render component
    * @returns {React.Component} App component
    */
   render() {
-    const {isLoading, error, isInitialized} = this.state;
+    const {isLoading, error, isInitialized, legalAgreementsAccepted} = this.state;
 
     if (isLoading) {
       return this.renderLoadingScreen();
@@ -336,6 +374,16 @@ export class App extends Component {
 
     if (!isInitialized) {
       return this.renderLoadingScreen();
+    }
+
+    // Show legal agreement screen if not accepted
+    if (!legalAgreementsAccepted) {
+      return (
+        <LegalAgreementScreen
+          onAccept={this.handleLegalAgreementAccept}
+          onDecline={this.handleLegalAgreementDecline}
+        />
+      );
     }
 
     return this.renderMainApp();

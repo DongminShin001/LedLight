@@ -98,6 +98,71 @@ export {
   MementoManager,
 } from './MementoPattern';
 
+// Facade Pattern - Simplified LED control API
+export {
+  LEDControllerFacade,
+  SimpleLEDFacade,
+} from './FacadePattern';
+
+// Proxy Pattern - Lazy loading and access control
+export {
+  LEDControlInterface,
+  RealLEDController,
+  LazyLEDProxy,
+  ProtectedLEDProxy,
+  CachingLEDProxy,
+  LoggingLEDProxy,
+  SmartLEDProxy,
+  AccessControl,
+  ProxyFactory,
+} from './ProxyPattern';
+
+// Composite Pattern - LED group management
+export {
+  LEDComponent,
+  IndividualLED,
+  LEDGroup,
+  Room,
+  Zone,
+  LEDHierarchyBuilder,
+  LEDCompositeManager,
+} from './CompositePattern';
+
+// Flyweight Pattern - Memory optimization
+export {
+  LEDConfigurationFlyweight,
+  LEDConfigurationFactory,
+  FlyweightLED,
+  LEDStripManager,
+  ColorPaletteFlyweight,
+  ColorPaletteFactory,
+  EffectTemplateFlyweight,
+  EffectTemplateFactory,
+} from './FlyweightPattern';
+
+// Abstract Factory - Creating families of related objects
+export {
+  AbstractLEDFactory,
+  ArduinoLEDFactory,
+  ESP32LEDFactory,
+  WS2812BFactory,
+  LEDFactoryProvider,
+  LEDSystemBuilder,
+  LEDSystem,
+} from './AbstractFactory';
+
+// Mediator Pattern - Component communication
+export {
+  Mediator,
+  LEDControlMediator,
+  MediatorComponent,
+  UIComponent,
+  AnalyticsComponent,
+  StorageComponent,
+  SchedulerComponent,
+  MediatorManager,
+} from './MediatorPattern';
+
 /**
  * Pattern Usage Guide:
  * 
