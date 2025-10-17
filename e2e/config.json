@@ -1,0 +1,21 @@
+{
+  "preset": "react-native",
+  "testEnvironment": "node",
+  "testMatch": ["**/e2e/**/*.e2e.js"],
+  "setupFilesAfterEnv": ["<rootDir>/e2e/init.js"],
+  "testTimeout": 120000,
+  "maxWorkers": 1,
+  "verbose": true,
+  "collectCoverage": false,
+  "reporters": [
+    "default",
+    [
+      "jest-html-reporters",
+      {
+        "publicPath": "./e2e-reports",
+        "filename": "e2e-report.html",
+        "expand": true
+      }
+    ]
+  ]
+}

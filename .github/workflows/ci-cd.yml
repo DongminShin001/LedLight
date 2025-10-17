@@ -1,0 +1,327 @@
+name: SmartLED Controller CI/CD Pipeline
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+  schedule:
+    # Run security scans daily at 2 AM UTC
+    - cron: '0 2 * * *'
+
+env:
+  NODE_VERSION: '18'
+  JAVA_VERSION: '17'
+  ANDROID_SDK_VERSION: '33'
+  ANDROID_BUILD_TOOLS: '33.0.0'
+
+jobs:
+  # Code Quality and Security Checks
+  code-quality:
+    name: Code Quality & Security
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run ESLint
+        run: npm run lint
+
+      - name: Run Prettier check
+        run: npm run format:check
+
+      - name: Run TypeScript check
+        run: npm run type-check
+
+      - name: Security audit
+        run: npm audit --audit-level=moderate
+
+      - name: Check for vulnerabilities
+        run: npm run security-check
+
+      - name: License compliance check
+        run: npm run license-check
+
+  # Unit and Integration Tests
+  testing:
+    name: Testing Suite
+    runs-on: ubuntu-latest
+    needs: code-quality
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run unit tests
+        run: npm run test:unit
+
+      - name: Run integration tests
+        run: npm run test:integration
+
+      - name: Generate test coverage
+        run: npm run test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          file: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+
+  # Android Build and Test
+  android-build:
+    name: Android Build & Test
+    runs-on: ubuntu-latest
+    needs: testing
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Setup Java
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'temurin'
+          java-version: ${{ env.JAVA_VERSION }}
+
+      - name: Setup Android SDK
+        uses: android-actions/setup-android@v2
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Android dependencies
+        run: cd android && ./gradlew dependencies
+
+      - name: Run Android tests
+        run: cd android && ./gradlew test
+
+      - name: Build Android APK (Debug)
+        run: cd android && ./gradlew assembleDebug
+
+      - name: Build Android APK (Release)
+        run: cd android && ./gradlew assembleRelease
+
+      - name: Upload Android APK
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-apk
+          path: android/app/build/outputs/apk/
+
+      - name: Run Android Lint
+        run: cd android && ./gradlew lint
+
+  # iOS Build and Test
+  ios-build:
+    name: iOS Build & Test
+    runs-on: macos-latest
+    needs: testing
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install iOS dependencies
+        run: cd ios && pod install
+
+      - name: Run iOS tests
+        run: cd ios && xcodebuild test -workspace LedLight.xcworkspace -scheme LedLight -destination 'platform=iOS Simulator,name=iPhone 14'
+
+      - name: Build iOS (Debug)
+        run: cd ios && xcodebuild build -workspace LedLight.xcworkspace -scheme LedLight -configuration Debug
+
+      - name: Build iOS (Release)
+        run: cd ios && xcodebuild build -workspace LedLight.xcworkspace -scheme LedLight -configuration Release
+
+      - name: Upload iOS build
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-build
+          path: ios/build/
+
+  # End-to-End Testing
+  e2e-testing:
+    name: E2E Testing
+    runs-on: ubuntu-latest
+    needs: [android-build, ios-build]
+    strategy:
+      matrix:
+        platform: [android, ios]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ${{ matrix.platform }}-apk
+          path: ./builds/
+
+      - name: Run E2E tests
+        run: npm run test:e2e -- --platform=${{ matrix.platform }}
+
+  # Performance Testing
+  performance-testing:
+    name: Performance Testing
+    runs-on: ubuntu-latest
+    needs: [android-build, ios-build]
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run performance tests
+        run: npm run test:performance
+
+      - name: Bundle size analysis
+        run: npm run analyze:bundle
+
+  # Security Scanning
+  security-scanning:
+    name: Security Scanning
+    runs-on: ubuntu-latest
+    needs: code-quality
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+
+      - name: Run CodeQL Analysis
+        uses: github/codeql-action/analyze@v2
+        with:
+          languages: javascript
+
+  # App Store Preparation
+  app-store-prep:
+    name: App Store Preparation
+    runs-on: ubuntu-latest
+    needs: [android-build, ios-build, e2e-testing, performance-testing]
+    if: github.ref == 'refs/heads/main'
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ env.NODE_VERSION }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: android-apk
+          path: ./builds/android/
+
+      - name: Download iOS build
+        uses: actions/download-artifact@v3
+        with:
+          name: ios-build
+          path: ./builds/ios/
+
+      - name: Validate app metadata
+        run: npm run validate:metadata
+
+      - name: Generate app store assets
+        run: npm run generate:assets
+
+      - name: Upload to App Store Connect (iOS)
+        if: matrix.platform == 'ios'
+        uses: apple-actions/upload-app-store@v1
+        with:
+          app-path: ./builds/ios/
+          api-key: ${{ secrets.APPLE_API_KEY }}
+          api-issuer: ${{ secrets.APPLE_API_ISSUER }}
+
+      - name: Upload to Google Play Console (Android)
+        if: matrix.platform == 'android'
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.GOOGLE_PLAY_SERVICE_ACCOUNT }}
+          packageName: com.smartledcontroller.app
+          releaseFiles: ./builds/android/app-release.apk
+          track: internal
+
+  # Notification and Reporting
+  notify:
+    name: Notify Results
+    runs-on: ubuntu-latest
+    needs: [code-quality, testing, android-build, ios-build, e2e-testing, performance-testing, security-scanning]
+    if: always()
+    steps:
+      - name: Notify on Success
+        if: ${{ needs.code-quality.result == 'success' && needs.testing.result == 'success' }}
+        run: |
+          echo "✅ All CI/CD checks passed successfully!"
+          # Add Slack/Discord notification here
+
+      - name: Notify on Failure
+        if: ${{ needs.code-quality.result == 'failure' || needs.testing.result == 'failure' }}
+        run: |
+          echo "❌ CI/CD pipeline failed. Please check the logs."
+          # Add Slack/Discord notification here
