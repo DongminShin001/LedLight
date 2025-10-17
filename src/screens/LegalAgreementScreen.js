@@ -8,8 +8,10 @@ import {
   Alert,
   Dimensions,
   Linking,
+  Animated,
 } from 'react-native';
 import Icon from 'react-native-vector-icons/MaterialIcons';
+import LinearGradient from 'react-native-linear-gradient';
 import {useTheme} from '../hooks/useTheme';
 import logger from '../utils/Logger';
 
@@ -22,8 +24,32 @@ const LegalAgreementScreen = ({navigation, onAccept, onDecline}) => {
   const [agreedToSafety, setAgreedToSafety] = useState(false);
   const [isAgeVerified, setIsAgeVerified] = useState(false);
   const [canProceed, setCanProceed] = useState(false);
+  
+  // Animation values
+  const fadeAnim = useState(new Animated.Value(0))[0];
+  const slideAnim = useState(new Animated.Value(30))[0];
+  const scaleAnim = useState(new Animated.Value(0.95))[0];
 
   useEffect(() => {
+    // Start entrance animations
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 1000,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     setCanProceed(agreedToTerms && agreedToPrivacy && agreedToSafety && isAgeVerified);
   }, [agreedToTerms, agreedToPrivacy, agreedToSafety, isAgeVerified]);
 
@@ -109,15 +135,30 @@ const LegalAgreementScreen = ({navigation, onAccept, onDecline}) => {
     <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
       <ScrollView style={styles.scrollView} showsVerticalScrollIndicator={false}>
         {/* Header */}
-        <View style={styles.header}>
-          <Icon name="gavel" size={48} color={theme.colors.primary} />
-          <Text style={[styles.title, {color: theme.colors.text}]}>
-            Legal Agreements
-          </Text>
-          <Text style={[styles.subtitle, {color: theme.colors.textSecondary}]}>
-            Please read and accept the following agreements to use SmartLED Controller
-          </Text>
-        </View>
+        <Animated.View 
+          style={[
+            styles.header,
+            {
+              opacity: fadeAnim,
+              transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+            },
+          ]}
+        >
+          <LinearGradient
+            colors={[theme.colors.primary, theme.colors.primaryDark]}
+            style={styles.headerGradient}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 1}}
+          >
+            <Icon name="gavel" size={48} color="#fff" />
+            <Text style={styles.title}>
+              Legal Agreements
+            </Text>
+            <Text style={styles.subtitle}>
+              Please read and accept the following agreements to use SmartLED Controller
+            </Text>
+          </LinearGradient>
+        </Animated.View>
 
         {/* Age Verification */}
         <View style={[styles.section, {backgroundColor: theme.colors.surface}]}>
@@ -243,34 +284,43 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
-    paddingHorizontal: 20,
   },
   header: {
-    alignItems: 'center',
-    paddingVertical: 30,
+    marginBottom: 20,
+  },
+  headerGradient: {
+    paddingVertical: 40,
     paddingHorizontal: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+    alignItems: 'center',
   },
   title: {
     fontSize: 28,
     fontWeight: '800',
+    color: '#fff',
     marginTop: 16,
     marginBottom: 8,
     textAlign: 'center',
   },
   subtitle: {
     fontSize: 16,
+    color: '#fff',
+    opacity: 0.9,
     textAlign: 'center',
     lineHeight: 22,
+    paddingHorizontal: 20,
   },
   section: {
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: 20,
+    padding: 24,
+    marginHorizontal: 20,
     marginBottom: 16,
     shadowColor: '#000',
-    shadowOffset: {width: 0, height: 2},
+    shadowOffset: {width: 0, height: 4},
     shadowOpacity: 0.1,
-    shadowRadius: 4,
-    elevation: 4,
+    shadowRadius: 8,
+    elevation: 8,
   },
   sectionTitle: {
     fontSize: 20,

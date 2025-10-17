@@ -171,28 +171,35 @@ export class DarkTheme extends Theme {
 
   initializeTheme() {
     this.colors = {
-      primary: '#00ff88',
-      secondary: '#4ecdc4',
-      accent: '#ff6b6b',
-      background: '#0f0f0f',
-      surface: '#1a1a1a',
-      card: '#1a1a1a',
+      primary: '#6366f1',
+      primaryDark: '#4f46e5',
+      primaryLight: '#818cf8',
+      secondary: '#8b5cf6',
+      accent: '#f59e0b',
+      background: '#0f0f23',
+      backgroundSecondary: '#1a1a2e',
+      surface: '#16213e',
+      surfaceSecondary: '#0e3460',
+      card: '#16213e',
       text: '#ffffff',
-      textSecondary: '#aaaaaa',
-      textMuted: '#666666',
-      border: '#333333',
+      textSecondary: '#a1a1aa',
+      textMuted: '#71717a',
+      border: '#374151',
+      divider: '#2d3748',
       shadow: '#000000',
-      success: '#00ff88',
-      warning: '#ffa500',
-      error: '#ff4444',
-      info: '#4facfe',
+      success: '#10b981',
+      warning: '#f59e0b',
+      error: '#ef4444',
+      info: '#3b82f6',
+      overlay: 'rgba(0, 0, 0, 0.5)',
     };
 
     this.gradients = {
-      primary: ['#00ff88', '#00cc6a'],
-      secondary: ['#4ecdc4', '#44a08d'],
-      accent: ['#ff6b6b', '#ff8e8e'],
-      surface: ['#1a1a1a', '#2a2a2a'],
+      primary: ['#6366f1', '#4f46e5'],
+      secondary: ['#8b5cf6', '#7c3aed'],
+      accent: ['#f59e0b', '#d97706'],
+      surface: ['#16213e', '#0e3460'],
+      background: ['#0f0f23', '#1a1a2e'],
     };
 
     this.typography = {

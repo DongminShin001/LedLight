@@ -1,5 +1,15 @@
 import React, {useState, useEffect} from 'react';
-import {View, Text, StyleSheet, TouchableOpacity, Dimensions, StatusBar, Alert} from 'react-native';
+import {
+  View,
+  Text,
+  StyleSheet,
+  TouchableOpacity,
+  Dimensions,
+  StatusBar,
+  Alert,
+  ScrollView,
+  Animated,
+} from 'react-native';
 import LinearGradient from 'react-native-linear-gradient';
 import Slider from '@react-native-community/slider';
 import Icon from 'react-native-vector-icons/MaterialIcons';
@@ -20,8 +30,32 @@ const HomeScreen = () => {
   const [isOn, setIsOn] = useState(false);
   const [currentColor, setCurrentColor] = useState('#00ff88');
   const [connectionState, setConnectionState] = useState('disconnected');
+  
+  // Animation values
+  const fadeAnim = useState(new Animated.Value(0))[0];
+  const slideAnim = useState(new Animated.Value(50))[0];
+  const scaleAnim = useState(new Animated.Value(0.9))[0];
 
   useEffect(() => {
+    // Start entrance animations
+    Animated.parallel([
+      Animated.timing(fadeAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(slideAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(scaleAnim, {
+        toValue: 1,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+    ]).start();
+
     // Initialize device manager and LED controller
     const initializeControllers = async () => {
       try {
@@ -98,35 +132,25 @@ const HomeScreen = () => {
   const handlePowerToggle = async () => {
     try {
       const newPowerState = !isOn;
-      const success = await LEDController.setPower(newPowerState);
-
-      if (success) {
-        setIsOn(newPowerState);
-        logger.info('Power toggle successful', {isOn: newPowerState});
-      } else {
-        throw new Error('Failed to toggle power');
-      }
+      await LEDController.setPower(newPowerState);
+      setIsOn(newPowerState);
+      logger.info('Power toggled', {isOn: newPowerState});
     } catch (error) {
-      logger.error('Power toggle failed', error);
+      logger.error('Failed to toggle power', error);
       const userMessage = ErrorHandler.getUserFriendlyMessage(error);
-      Alert.alert('Error', userMessage);
+      Alert.alert('Power Control Error', userMessage);
     }
   };
 
-  const handleBrightnessChange = async value => {
+  const handleBrightnessChange = async (value) => {
     try {
-      const success = await LEDController.setBrightness(value);
-
-      if (success) {
-        setBrightness(value);
-        logger.info('Brightness change successful!!', {brightness: value});
-      } else {
-        throw new Error('Failed to change brightness');
-      }
+      await LEDController.setBrightness(value);
+      setBrightness(value);
+      logger.info('Brightness changed', {brightness: value});
     } catch (error) {
-      logger.error('Brightness change failed', error);
+      logger.error('Failed to change brightness', error);
       const userMessage = ErrorHandler.getUserFriendlyMessage(error);
-      Alert.alert('Error', userMessage);
+      Alert.alert('Brightness Control Error', userMessage);
     }
   };
 
@@ -138,23 +162,16 @@ const HomeScreen = () => {
     try {
       if (isConnected) {
         await DeviceManager.disconnect();
-        return;
+        setIsConnected(false);
+        setConnectionState('disconnected');
+        logger.info('Device disconnected');
+      } else {
+        await DeviceManager.connect();
+        // Connection state will be updated via event listener
+        logger.info('Attempting to connect to device');
       }
-
-      // Show device selection
-      const devices = await DeviceManager.scanForDevices();
-
-      if (devices.length === 0) {
-        Alert.alert('No Devices', 'No LED devices found. Please pair a device first.');
-        return;
-      }
-
-      // For simplicity, connect to the first available device
-      // In a real app, you'd show a device selection dialog
-      const device = devices[0];
-      await DeviceManager.connectToDevice(device);
     } catch (error) {
-      logger.error('Connection failed', error);
+      logger.error('Connection error', error);
       const userMessage = ErrorHandler.getUserFriendlyMessage(error);
       Alert.alert('Connection Error', userMessage);
     }
@@ -162,410 +179,516 @@ const HomeScreen = () => {
 
   if (themeLoading) {
     return (
-      <View style={[styles.loadingContainer, {backgroundColor: theme.colors.background}]}>
-        <Icon name="palette" size={64} color={theme.colors.primary} />
-        <Text style={[styles.loadingText, {color: theme.colors.text}]}>Loading...</Text>
+      <View style={[styles.loadingContainer, {backgroundColor: theme?.colors?.background || '#000'}]}>
+        <Text style={[styles.loadingText, {color: theme?.colors?.text || '#fff'}]}>
+          Loading...
+        </Text>
       </View>
     );
   }
 
   return (
-    <View style={[styles.container, {backgroundColor: theme.colors.background}]}>
-      <StatusBar barStyle="light-content" backgroundColor={theme.colors.surface} />
+    <ScrollView style={[styles.container, {backgroundColor: theme.colors.background}]} showsVerticalScrollIndicator={false}>
+      <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
+      
+      {/* Header Section */}
+      <Animated.View 
+        style={[
+          styles.headerSection,
+          {
+            opacity: fadeAnim,
+            transform: [{translateY: slideAnim}],
+          },
+        ]}
+      >
+        <LinearGradient
+          colors={[theme.colors.primary, theme.colors.primaryDark]}
+          style={styles.headerGradient}
+          start={{x: 0, y: 0}}
+          end={{x: 1, y: 1}}
+        >
+          <View style={styles.headerContent}>
+            <Icon name="lightbulb" size={32} color="#fff" />
+            <Text style={styles.headerTitle}>SmartLED Controller</Text>
+            <Text style={styles.headerSubtitle}>Control your LED lights with style</Text>
+          </View>
+        </LinearGradient>
+      </Animated.View>
 
-      {/* Header */}
-      <View style={styles.header}>
-        <Text style={styles.title}>SmartLED Controller</Text>
-        <TouchableOpacity
-          style={[styles.connectButton, isConnected && styles.connectedButton]}
-          onPress={handleConnect}>
-          <Icon
-            name={isConnected ? 'bluetooth-connected' : 'bluetooth'}
-            size={24}
-            color={isConnected ? '#00ff88' : '#fff'}
+      {/* Connection Status Card */}
+      <Animated.View 
+        style={[
+          styles.card,
+          styles.statusCard,
+          {
+            opacity: fadeAnim,
+            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+          },
+        ]}
+      >
+        <View style={styles.cardHeader}>
+          <Icon 
+            name={isConnected ? "bluetooth-connected" : "bluetooth-disabled"} 
+            size={24} 
+            color={isConnected ? theme.colors.success : theme.colors.error} 
           />
-          <Text style={[styles.connectText, isConnected && styles.connectedText]}>
-            {isConnected ? 'Connected' : 'Connect'}
+          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>
+            Device Status
+          </Text>
+        </View>
+        <Text style={[styles.statusText, {color: theme.colors.textSecondary}]}>
+          {isConnected ? 'Connected to LED Device' : 'No device connected'}
+        </Text>
+        <TouchableOpacity
+          style={[
+            styles.connectButton,
+            {backgroundColor: isConnected ? theme.colors.success : theme.colors.primary},
+          ]}
+          onPress={handleConnect}
+        >
+          <Text style={styles.buttonText}>
+            {isConnected ? 'Disconnect' : 'Connect Device'}
           </Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
-      {/* LED Preview */}
-      <View style={styles.ledPreview}>
-        <View
+      {/* Power Control Card */}
+      <Animated.View 
+        style={[
+          styles.card,
+          styles.controlCard,
+          {
+            opacity: fadeAnim,
+            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+          },
+        ]}
+      >
+        <View style={styles.cardHeader}>
+          <Icon name="power-settings-new" size={24} color={theme.colors.primary} />
+          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>
+            Power Control
+          </Text>
+        </View>
+        
+        <TouchableOpacity
           style={[
-            styles.ledCircle,
+            styles.powerButton,
             {
-              backgroundColor: isOn ? currentColor : '#333',
-              opacity: isOn ? brightness / 100 : 0.3,
+              backgroundColor: isOn ? theme.colors.success : theme.colors.error,
+              shadowColor: isOn ? theme.colors.success : theme.colors.error,
             },
           ]}
-        />
-        <Text style={styles.statusText}>{isOn ? 'ON' : 'OFF'}</Text>
-      </View>
+          onPress={handlePowerToggle}
+          disabled={!isConnected}
+        >
+          <Icon name={isOn ? "power" : "power-off"} size={32} color="#fff" />
+          <Text style={styles.powerButtonText}>
+            {isOn ? 'ON' : 'OFF'}
+          </Text>
+        </TouchableOpacity>
+      </Animated.View>
 
-      {/* Power Button */}
-      <TouchableOpacity
-        style={[styles.powerButton, isOn && styles.powerButtonOn]}
-        onPress={handlePowerToggle}>
-        <Icon name={isOn ? 'power-off' : 'power'} size={40} color={isOn ? '#000' : '#fff'} />
-      </TouchableOpacity>
-
-      {/* Brightness Control */}
-      <View style={styles.brightnessContainer}>
-        <Text style={styles.brightnessLabel}>Brightness</Text>
+      {/* Brightness Control Card */}
+      <Animated.View 
+        style={[
+          styles.card,
+          styles.controlCard,
+          {
+            opacity: fadeAnim,
+            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+          },
+        ]}
+      >
+        <View style={styles.cardHeader}>
+          <Icon name="brightness-6" size={24} color={theme.colors.primary} />
+          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>
+            Brightness: {brightness}%
+          </Text>
+        </View>
+        
         <View style={styles.sliderContainer}>
-          <Icon name="brightness-low" size={20} color="#666" />
+          <Icon name="brightness-1" size={20} color={theme.colors.textSecondary} />
           <Slider
             style={styles.slider}
             minimumValue={0}
             maximumValue={100}
             value={brightness}
-            onValueChange={handleBrightnessChange}
-            minimumTrackTintColor="#00ff88"
-            maximumTrackTintColor="#333"
-            thumbStyle={styles.sliderThumb}
-            disabled={!isOn}
+            onValueChange={setBrightness}
+            onSlidingComplete={handleBrightnessChange}
+            minimumTrackTintColor={theme.colors.primary}
+            maximumTrackTintColor={theme.colors.textMuted}
+            thumbStyle={{backgroundColor: theme.colors.primary}}
+            disabled={!isConnected || !isOn}
           />
-          <Icon name="brightness-high" size={20} color="#666" />
+          <Icon name="brightness-7" size={20} color={theme.colors.textSecondary} />
         </View>
-        <Text style={styles.brightnessValue}>{brightness}%</Text>
-      </View>
+      </Animated.View>
 
-      {/* Color Control */}
-      <TouchableOpacity style={styles.colorButton} onPress={handleColorPress}>
-        <LinearGradient colors={[currentColor, currentColor]} style={styles.colorGradient}>
-          <Icon name="palette" size={24} color="#fff" />
-          <Text style={styles.colorButtonText}>Choose Color</Text>
-        </LinearGradient>
-      </TouchableOpacity>
-
-      {/* Quick Actions */}
-      <View style={styles.quickActions}>
-        <TouchableOpacity style={styles.quickActionButton}>
-          <Icon name="wb-sunny" size={24} color="#fff" />
-          <Text style={styles.quickActionText}>Daylight</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.quickActionButton}>
-          <Icon name="nightlight-round" size={24} color="#fff" />
-          <Text style={styles.quickActionText}>Night</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={styles.quickActionButton}>
-          <Icon name="favorite" size={24} color="#fff" />
-          <Text style={styles.quickActionText}>Warm</Text>
-        </TouchableOpacity>
+      {/* Color Control Card */}
+      <Animated.View 
+        style={[
+          styles.card,
+          styles.colorCard,
+          {
+            opacity: fadeAnim,
+            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+          },
+        ]}
+      >
+        <View style={styles.cardHeader}>
+          <Icon name="palette" size={24} color={theme.colors.primary} />
+          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>
+            Color Control
+          </Text>
+        </View>
+        
+        <View style={styles.colorPreviewContainer}>
+          <View 
+            style={[
+              styles.colorPreview,
+              {backgroundColor: currentColor},
+            ]}
+          />
+          <Text style={[styles.colorText, {color: theme.colors.text}]}>
+            {currentColor.toUpperCase()}
+          </Text>
+        </View>
+        
         <TouchableOpacity
-          style={styles.quickActionButton}
-          onPress={() => navigation.navigate('TextDisplay')}>
-          <Icon name="text-fields" size={24} color="#fff" />
-          <Text style={styles.quickActionText}>Custom Text</Text>
+          style={[styles.colorButton, {backgroundColor: theme.colors.primary}]}
+          onPress={() => navigation.navigate('ColorPicker')}
+          disabled={!isConnected || !isOn}
+        >
+          <Icon name="color-lens" size={20} color="#fff" />
+          <Text style={styles.buttonText}>Choose Color</Text>
         </TouchableOpacity>
-      </View>
+      </Animated.View>
 
-      {/* Advanced Features */}
-      <View style={styles.advancedFeatures}>
-        <Text style={styles.advancedTitle}>Advanced Features</Text>
-        <View style={styles.featureGrid}>
+      {/* Quick Actions Card */}
+      <Animated.View 
+        style={[
+          styles.card,
+          styles.actionsCard,
+          {
+            opacity: fadeAnim,
+            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+          },
+        ]}
+      >
+        <View style={styles.cardHeader}>
+          <Icon name="flash-on" size={24} color={theme.colors.primary} />
+          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>
+            Quick Actions
+          </Text>
+        </View>
+        
+        <View style={styles.quickActionsGrid}>
           <TouchableOpacity
-            style={styles.featureButton}
-            onPress={() => navigation.navigate('AdvancedEffects')}>
-            <LinearGradient colors={['#ff6b6b', '#ff8e8e']} style={styles.featureGradient}>
-              <Icon name="auto-awesome" size={32} color="#fff" />
-              <Text style={styles.featureText}>Advanced Effects</Text>
-            </LinearGradient>
+            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+            onPress={() => navigation.navigate('Effects')}
+          >
+            <Icon name="auto-fix-high" size={24} color={theme.colors.primary} />
+            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>
+              Effects
+            </Text>
           </TouchableOpacity>
-
+          
           <TouchableOpacity
-            style={styles.featureButton}
-            onPress={() => navigation.navigate('MusicReactive')}>
-            <LinearGradient colors={['#4ecdc4', '#44a08d']} style={styles.featureGradient}>
-              <Icon name="music-note" size={32} color="#fff" />
-              <Text style={styles.featureText}>Music Reactive</Text>
-            </LinearGradient>
+            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+            onPress={() => navigation.navigate('Presets')}
+          >
+            <Icon name="bookmark" size={24} color={theme.colors.primary} />
+            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>
+              Presets
+            </Text>
           </TouchableOpacity>
-
+          
           <TouchableOpacity
-            style={styles.featureButton}
-            onPress={() => navigation.navigate('Scheduling')}>
-            <LinearGradient colors={['#45b7d1', '#96c93d']} style={styles.featureGradient}>
-              <Icon name="schedule" size={32} color="#fff" />
-              <Text style={styles.featureText}>Scheduling</Text>
-            </LinearGradient>
+            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+            onPress={() => navigation.navigate('TextDisplay')}
+          >
+            <Icon name="text-fields" size={24} color={theme.colors.primary} />
+            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>
+              Text
+            </Text>
           </TouchableOpacity>
-
+          
           <TouchableOpacity
-            style={styles.featureButton}
-            onPress={() => navigation.navigate('DeviceManagement')}>
-            <LinearGradient colors={['#f093fb', '#f5576c']} style={styles.featureGradient}>
-              <Icon name="devices" size={32} color="#fff" />
-              <Text style={styles.featureText}>Device Management</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.featureButton}
-            onPress={() => navigation.navigate('Analytics')}>
-            <LinearGradient colors={['#4facfe', '#00f2fe']} style={styles.featureGradient}>
-              <Icon name="analytics" size={32} color="#fff" />
-              <Text style={styles.featureText}>Analytics</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.featureButton}
-            onPress={() => navigation.navigate('ColorPicker')}>
-            <LinearGradient colors={['#fa709a', '#fee140']} style={styles.featureGradient}>
-              <Icon name="palette" size={32} color="#fff" />
-              <Text style={styles.featureText}>Color Picker</Text>
-            </LinearGradient>
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.featureButton}
-            onPress={() => navigation.navigate('ThemeSelection')}>
-            <LinearGradient colors={['#667eea', '#764ba2']} style={styles.featureGradient}>
-              <Icon name="color-lens" size={32} color="#fff" />
-              <Text style={styles.featureText}>Themes</Text>
-            </LinearGradient>
+            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+            onPress={() => navigation.navigate('ThemeSelection')}
+          >
+            <Icon name="palette" size={24} color={theme.colors.primary} />
+            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>
+              Themes
+            </Text>
           </TouchableOpacity>
         </View>
-      </View>
-    </View>
+      </Animated.View>
+
+      {/* Advanced Features Card */}
+      <Animated.View 
+        style={[
+          styles.card,
+          styles.advancedCard,
+          {
+            opacity: fadeAnim,
+            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+          },
+        ]}
+      >
+        <View style={styles.cardHeader}>
+          <Icon name="settings" size={24} color={theme.colors.primary} />
+          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>
+            Advanced Features
+          </Text>
+        </View>
+        
+        <View style={styles.advancedActions}>
+          <TouchableOpacity
+            style={[styles.advancedButton, {backgroundColor: theme.colors.surface}]}
+            onPress={() => navigation.navigate('AdvancedEffects')}
+          >
+            <Icon name="auto-awesome" size={20} color={theme.colors.primary} />
+            <Text style={[styles.advancedButtonText, {color: theme.colors.text}]}>
+              Advanced Effects
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.advancedButton, {backgroundColor: theme.colors.surface}]}
+            onPress={() => navigation.navigate('MusicReactive')}
+          >
+            <Icon name="music-note" size={20} color={theme.colors.primary} />
+            <Text style={[styles.advancedButtonText, {color: theme.colors.text}]}>
+              Music Reactive
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.advancedButton, {backgroundColor: theme.colors.surface}]}
+            onPress={() => navigation.navigate('Scheduling')}
+          >
+            <Icon name="schedule" size={20} color={theme.colors.primary} />
+            <Text style={[styles.advancedButtonText, {color: theme.colors.text}]}>
+              Scheduling
+            </Text>
+          </TouchableOpacity>
+          
+          <TouchableOpacity
+            style={[styles.advancedButton, {backgroundColor: theme.colors.surface}]}
+            onPress={() => navigation.navigate('DeviceManagement')}
+          >
+            <Icon name="devices" size={20} color={theme.colors.primary} />
+            <Text style={[styles.advancedButtonText, {color: theme.colors.text}]}>
+              Device Management
+            </Text>
+          </TouchableOpacity>
+        </View>
+      </Animated.View>
+
+      {/* Bottom Spacing */}
+      <View style={styles.bottomSpacing} />
+    </ScrollView>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0f0f0f',
-    paddingHorizontal: 20,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    paddingTop: 20,
-    paddingBottom: 30,
-  },
-  title: {
-    fontSize: 32,
-    fontWeight: '800',
-    color: '#fff',
-    letterSpacing: -0.5,
-  },
-  connectButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    paddingHorizontal: 16,
-    paddingVertical: 10,
-    borderRadius: 25,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  connectedButton: {
-    backgroundColor: '#00ff8815',
-    borderWidth: 2,
-    borderColor: '#00ff88',
-    shadowColor: '#00ff88',
-    shadowOpacity: 0.4,
-  },
-  connectText: {
-    color: '#fff',
-    marginLeft: 5,
-    fontSize: 14,
-  },
-  connectedText: {
-    color: '#00ff88',
-  },
-  ledPreview: {
-    alignItems: 'center',
-    marginVertical: 40,
-  },
-  ledCircle: {
-    width: 140,
-    height: 140,
-    borderRadius: 70,
-    marginBottom: 20,
-    shadowColor: '#00ff88',
-    shadowOffset: {
-      width: 0,
-      height: 0,
-    },
-    shadowOpacity: 0.6,
-    shadowRadius: 30,
-    elevation: 15,
-  },
-  statusText: {
-    fontSize: 20,
-    fontWeight: '700',
-    color: '#fff',
-    letterSpacing: 1,
-  },
-  powerButton: {
-    width: 90,
-    height: 90,
-    borderRadius: 45,
-    backgroundColor: '#1a1a1a',
+  loadingContainer: {
+    flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    alignSelf: 'center',
-    marginVertical: 30,
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 6},
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 12,
   },
-  powerButtonOn: {
-    backgroundColor: '#00ff88',
-    shadowColor: '#00ff88',
-    shadowOpacity: 0.6,
+  loadingText: {
+    fontSize: 18,
+    fontWeight: '600',
+    marginTop: 16,
   },
-  brightnessContainer: {
-    marginVertical: 30,
-    backgroundColor: '#1a1a1a',
+  headerSection: {
+    marginBottom: 20,
+  },
+  headerGradient: {
+    paddingVertical: 30,
+    paddingHorizontal: 20,
+    borderBottomLeftRadius: 24,
+    borderBottomRightRadius: 24,
+  },
+  headerContent: {
+    alignItems: 'center',
+  },
+  headerTitle: {
+    fontSize: 28,
+    fontWeight: '800',
+    color: '#fff',
+    marginTop: 12,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
+  headerSubtitle: {
+    fontSize: 16,
+    color: '#fff',
+    opacity: 0.9,
+    textAlign: 'center',
+  },
+  card: {
+    marginHorizontal: 20,
+    marginBottom: 16,
     borderRadius: 20,
     padding: 20,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
+    shadowOpacity: 0.1,
     shadowRadius: 8,
     elevation: 8,
   },
-  brightnessLabel: {
+  statusCard: {
+    backgroundColor: '#fff',
+  },
+  controlCard: {
+    backgroundColor: '#fff',
+  },
+  colorCard: {
+    backgroundColor: '#fff',
+  },
+  actionsCard: {
+    backgroundColor: '#fff',
+  },
+  advancedCard: {
+    backgroundColor: '#fff',
+  },
+  cardHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 12,
+  },
+  cardTitle: {
     fontSize: 18,
-    fontWeight: '600',
+    fontWeight: '700',
+    marginLeft: 12,
+  },
+  statusText: {
+    fontSize: 14,
+    marginBottom: 16,
+    lineHeight: 20,
+  },
+  connectButton: {
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
+    alignItems: 'center',
+  },
+  buttonText: {
     color: '#fff',
-    marginBottom: 15,
-    textAlign: 'center',
-    letterSpacing: 0.5,
+    fontSize: 16,
+    fontWeight: '600',
+  },
+  powerButton: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    justifyContent: 'center',
+    alignItems: 'center',
+    alignSelf: 'center',
+    shadowOffset: {width: 0, height: 8},
+    shadowOpacity: 0.3,
+    shadowRadius: 16,
+    elevation: 12,
+  },
+  powerButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 8,
   },
   sliderContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
+    paddingHorizontal: 8,
   },
   slider: {
     flex: 1,
-    marginHorizontal: 20,
+    height: 40,
+    marginHorizontal: 12,
   },
-  sliderThumb: {
-    backgroundColor: '#00ff88',
-    width: 24,
-    height: 24,
-    shadowColor: '#00ff88',
-    shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.5,
-    shadowRadius: 4,
-    elevation: 4,
+  colorPreviewContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 16,
   },
-  brightnessValue: {
-    fontSize: 20,
-    color: '#00ff88',
-    textAlign: 'center',
-    marginTop: 15,
-    fontWeight: '700',
-    letterSpacing: 1,
+  colorPreview: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    marginRight: 16,
+    borderWidth: 2,
+    borderColor: '#e0e0e0',
+  },
+  colorText: {
+    fontSize: 16,
+    fontWeight: '600',
+    flex: 1,
   },
   colorButton: {
-    marginVertical: 30,
-    borderRadius: 25,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 4},
-    shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
-  },
-  colorGradient: {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 18,
-    borderRadius: 25,
+    paddingVertical: 12,
+    paddingHorizontal: 24,
+    borderRadius: 12,
   },
-  colorButtonText: {
-    color: '#fff',
-    fontSize: 18,
-    fontWeight: '700',
-    marginLeft: 12,
-    letterSpacing: 0.5,
-  },
-  quickActions: {
+  quickActionsGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
-    marginTop: 30,
-    marginBottom: 20,
   },
   quickActionButton: {
+    width: (width - 80) / 2,
+    paddingVertical: 16,
+    paddingHorizontal: 12,
+    borderRadius: 12,
     alignItems: 'center',
-    backgroundColor: '#1a1a1a',
-    paddingVertical: 18,
-    paddingHorizontal: 16,
-    borderRadius: 18,
-    minWidth: 85,
     marginBottom: 12,
-    flex: 1,
-    marginHorizontal: 4,
     shadowColor: '#000',
     shadowOffset: {width: 0, height: 2},
-    shadowOpacity: 0.2,
+    shadowOpacity: 0.1,
     shadowRadius: 4,
     elevation: 4,
   },
   quickActionText: {
-    color: '#fff',
-    fontSize: 13,
-    marginTop: 6,
+    fontSize: 14,
     fontWeight: '600',
-    letterSpacing: 0.3,
-  },
-  advancedFeatures: {
-    marginTop: 40,
-    marginBottom: 30,
-  },
-  advancedTitle: {
-    fontSize: 24,
-    fontWeight: '700',
-    color: '#fff',
-    marginBottom: 20,
+    marginTop: 8,
     textAlign: 'center',
-    letterSpacing: 0.5,
   },
-  featureGrid: {
+  advancedActions: {
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'space-between',
   },
-  featureButton: {
-    width: (width - 60) / 2,
-    marginBottom: 16,
-    borderRadius: 20,
-    overflow: 'hidden',
-    shadowColor: '#000',
-    shadowOffset: {width: 0, height: 6},
-    shadowOpacity: 0.4,
-    shadowRadius: 12,
-    elevation: 12,
-  },
-  featureGradient: {
-    padding: 24,
+  advancedButton: {
+    width: (width - 80) / 2,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
-    minHeight: 120,
+    paddingVertical: 12,
+    paddingHorizontal: 16,
+    borderRadius: 12,
+    marginBottom: 12,
+    shadowColor: '#000',
+    shadowOffset: {width: 0, height: 2},
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
-  featureText: {
-    color: '#fff',
-    fontSize: 15,
-    fontWeight: '700',
-    marginTop: 10,
-    textAlign: 'center',
-    letterSpacing: 0.3,
+  advancedButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    marginLeft: 8,
+    flex: 1,
+  },
+  bottomSpacing: {
+    height: 20,
   },
 });
 
