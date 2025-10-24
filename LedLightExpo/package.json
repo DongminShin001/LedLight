@@ -1,0 +1,140 @@
+{
+  "name": "SmartLED Controller",
+  "version": "1.0.0",
+  "description": "Professional LED lighting control app for smart home and commercial lighting systems",
+  "main": "index.js",
+  "scripts": {
+    "android": "expo run:android",
+    "ios": "expo run:ios",
+    "start": "react-native start",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage",
+    "test:unit": "jest --testPathPattern=unit",
+    "test:integration": "jest --testPathPattern=integration",
+    "test:e2e": "detox test",
+    "test:performance": "jest --testPathPattern=performance",
+    "lint": "eslint . --ext .js,.jsx,.ts,.tsx",
+    "lint:fix": "eslint . --ext .js,.jsx,.ts,.tsx --fix",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "type-check": "tsc --noEmit",
+    "security-check": "npm audit --audit-level=moderate",
+    "license-check": "license-checker --onlyAllow 'MIT;Apache-2.0;BSD-2-Clause;BSD-3-Clause'",
+    "validate:metadata": "node scripts/validate-metadata.js",
+    "generate:assets": "node scripts/generate-assets.js",
+    "analyze:bundle": "npx react-native-bundle-visualizer",
+    "build:android": "cd android && ./gradlew assembleRelease",
+    "build:ios": "cd ios && xcodebuild -workspace LedLight.xcworkspace -scheme LedLight -configuration Release -destination generic/platform=iOS -archivePath LedLight.xcarchive archive",
+    "clean": "react-native clean",
+    "clean:android": "cd android && ./gradlew clean",
+    "clean:ios": "cd ios && xcodebuild clean",
+    "postinstall": "cd ios && pod install"
+  },
+  "dependencies": {
+    "@react-native-async-storage/async-storage": "1.18.2",
+    "@react-native-community/datetimepicker": "7.2.0",
+    "@react-native-community/slider": "4.4.2",
+    "@react-navigation/bottom-tabs": "^6.5.11",
+    "@react-navigation/native": "^6.1.9",
+    "@react-navigation/stack": "^6.3.20",
+    "crypto-js": "^4.1.1",
+    "expo": "~49.0.0",
+    "react": "18.2.0",
+    "react-native": "0.72.10",
+    "react-native-bluetooth-classic": "^1.60.0-rc.5",
+    "react-native-gesture-handler": "~2.12.0",
+    "react-native-haptic-feedback": "^2.2.0",
+    "react-native-linear-gradient": "^2.8.3",
+    "react-native-permissions": "^3.10.1",
+    "react-native-safe-area-context": "4.6.3",
+    "react-native-screens": "~3.22.0",
+    "react-native-svg": "13.9.0",
+    "react-native-vector-icons": "^10.3.0"
+  },
+  "devDependencies": {
+    "@babel/core": "^7.20.0",
+    "@babel/preset-env": "^7.20.0",
+    "@babel/runtime": "^7.20.0",
+    "@react-native/eslint-config": "^0.72.2",
+    "@react-native/metro-config": "^0.72.11",
+    "@testing-library/jest-native": "^5.4.0",
+    "@testing-library/react-native": "^12.0.0",
+    "@tsconfig/react-native": "^3.0.0",
+    "@types/jest": "^29.5.0",
+    "@types/react": "^18.0.24",
+    "@types/react-test-renderer": "^18.0.0",
+    "@typescript-eslint/eslint-plugin": "^5.59.0",
+    "@typescript-eslint/parser": "^5.59.0",
+    "babel-jest": "^29.2.1",
+    "cross-env": "^7.0.3",
+    "detox": "^20.0.0",
+    "eslint": "^8.19.0",
+    "eslint-plugin-react": "^7.33.0",
+    "eslint-plugin-react-hooks": "^4.6.0",
+    "eslint-plugin-react-native": "^4.1.0",
+    "husky": "^8.0.3",
+    "jest": "^29.2.1",
+    "license-checker": "^25.0.1",
+    "lint-staged": "^15.0.0",
+    "metro-react-native-babel-preset": "0.76.8",
+    "prettier": "^2.4.1",
+    "react-native-bundle-visualizer": "^2.0.0",
+    "react-test-renderer": "18.2.0",
+    "snyk": "^1.1248.0",
+    "typescript": "4.8.4"
+  },
+  "jest": {
+    "preset": "react-native",
+    "setupFilesAfterEnv": [
+      "<rootDir>/src/utils/testSetup.js"
+    ],
+    "testMatch": [
+      "**/__tests__/**/*.(js|jsx|ts|tsx)",
+      "**/*.(test|spec).(js|jsx|ts|tsx)"
+    ],
+    "collectCoverageFrom": [
+      "src/**/*.{js,jsx,ts,tsx}",
+      "!src/**/*.d.ts",
+      "!src/**/__tests__/**",
+      "!src/**/__mocks__/**"
+    ],
+    "coverageThreshold": {
+      "global": {
+        "branches": 80,
+        "functions": 80,
+        "lines": 80,
+        "statements": 80
+      }
+    },
+    "transformIgnorePatterns": [
+      "node_modules/(?!(react-native|@react-native|react-native-.*|@react-navigation|@react-native-community|react-native-vector-icons|react-native-linear-gradient|react-native-svg|react-native-haptic-feedback)/)"
+    ]
+  },
+  "engines": {
+    "node": ">=16.0.0",
+    "npm": ">=8.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/yourusername/ledlight-app.git"
+  },
+  "keywords": [
+    "react-native",
+    "led-controller",
+    "smart-lighting",
+    "bluetooth",
+    "mobile",
+    "iot",
+    "home-automation",
+    "commercial-lighting",
+    "rgb-lighting",
+    "led-effects"
+  ],
+  "author": "SmartLED Technologies",
+  "license": "MIT",
+  "homepage": "https://smartled-controller.com",
+  "bugs": {
+    "url": "https://github.com/smartled-controller/issues"
+  }
+}
