@@ -116,7 +116,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/yourusername/ledlight-app.git"
+    "url": "https://github.com/DongminShin001/LedLight.git"
   },
   "keywords": [
     "react-native",
@@ -132,8 +132,8 @@
   ],
   "author": "SmartLED Technologies",
   "license": "MIT",
-  "homepage": "https://smartled-controller.com",
+  "homepage": "https://github.com/DongminShin001/LedLight#readme",
   "bugs": {
-    "url": "https://github.com/smartled-controller/issues"
+    "url": "https://github.com/DongminShin001/LedLight/issues"
   }
 }
