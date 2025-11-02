@@ -19,6 +19,7 @@ import DeviceManager from '../classes/DeviceManager';
 import {ErrorHandler} from '../utils/ErrorHandler';
 import logger from '../utils/Logger';
 import {useTheme} from '../hooks/useTheme';
+import SafetyDisclaimer, {shouldShowDisclaimer} from '../components/SafetyDisclaimer';
 
 const {width, height} = Dimensions.get('window');
 
@@ -30,6 +31,8 @@ const HomeScreen = () => {
   const [isOn, setIsOn] = useState(false);
   const [currentColor, setCurrentColor] = useState('#00ff88');
   const [connectionState, setConnectionState] = useState('disconnected');
+  const [showSafetyDisclaimer, setShowSafetyDisclaimer] = useState(false);
+  const [pendingAction, setPendingAction] = useState(null);
 
   // Animation values
   const fadeAnim = useState(new Animated.Value(0))[0];
@@ -130,11 +133,55 @@ const HomeScreen = () => {
   };
 
   const handlePowerToggle = async () => {
+    // Check if we should show safety disclaimer
+    const shouldShow = await shouldShowDisclaimer();
+    if (shouldShow) {
+      setPendingAction(() => () => executePowerToggle());
+      setShowSafetyDisclaimer(true);
+      return;
+    }
+
+    executePowerToggle();
+  };
+
+  const executePowerToggle = async () => {
     try {
       const newPowerState = !isOn;
-      await LEDController.setPower(newPowerState);
-      setIsOn(newPowerState);
-      logger.info('Power toggled', {isOn: newPowerState});
+
+      // Additional safety confirmation for turning ON
+      if (newPowerState) {
+        Alert.alert(
+          '⚠️ Safety Confirmation',
+          'Before turning on LED devices:\n\n' +
+            '• Ensure all installations are by licensed electricians\n' +
+            '• Verify all connections are secure\n' +
+            '• Confirm proper circuit protection is in place\n\n' +
+            'Continue?',
+          [
+            {text: 'Cancel', style: 'cancel'},
+            {
+              text: 'Turn ON',
+              style: 'default',
+              onPress: async () => {
+                try {
+                  await LEDController.setPower(newPowerState);
+                  setIsOn(newPowerState);
+                  logger.info('Power toggled', {isOn: newPowerState});
+                } catch (error) {
+                  logger.error('Failed to toggle power', error);
+                  const userMessage = ErrorHandler.getUserFriendlyMessage(error);
+                  Alert.alert('Power Control Error', userMessage);
+                }
+              },
+            },
+          ],
+        );
+      } else {
+        // Turning OFF doesn't need extra confirmation
+        await LEDController.setPower(newPowerState);
+        setIsOn(newPowerState);
+        logger.info('Power toggled', {isOn: newPowerState});
+      }
     } catch (error) {
       logger.error('Failed to toggle power', error);
       const userMessage = ErrorHandler.getUserFriendlyMessage(error);
@@ -187,261 +234,281 @@ const HomeScreen = () => {
   }
 
   return (
-    <ScrollView
-      style={[styles.container, {backgroundColor: theme.colors.background}]}
-      showsVerticalScrollIndicator={false}>
-      <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
+    <>
+      <ScrollView
+        style={[styles.container, {backgroundColor: theme.colors.background}]}
+        showsVerticalScrollIndicator={false}>
+        <StatusBar barStyle="light-content" backgroundColor={theme.colors.background} />
 
-      {/* Header Section */}
-      <Animated.View
-        style={[
-          styles.headerSection,
-          {
-            opacity: fadeAnim,
-            transform: [{translateY: slideAnim}],
-          },
-        ]}>
-        <LinearGradient
-          colors={[theme.colors.primary, theme.colors.primaryDark]}
-          style={styles.headerGradient}
-          start={{x: 0, y: 0}}
-          end={{x: 1, y: 1}}>
-          <View style={styles.headerContent}>
-            <Icon name="lightbulb" size={32} color="#fff" />
-            <Text style={styles.headerTitle}>SmartLED Controller</Text>
-            <Text style={styles.headerSubtitle}>Control your LED lights with style</Text>
-          </View>
-        </LinearGradient>
-      </Animated.View>
-
-      {/* Connection Status Card */}
-      <Animated.View
-        style={[
-          styles.card,
-          styles.statusCard,
-          {
-            opacity: fadeAnim,
-            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
-          },
-        ]}>
-        <View style={styles.cardHeader}>
-          <Icon
-            name={isConnected ? 'bluetooth-connected' : 'bluetooth-disabled'}
-            size={24}
-            color={isConnected ? theme.colors.success : theme.colors.error}
-          />
-          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>Device Status</Text>
-        </View>
-        <Text style={[styles.statusText, {color: theme.colors.textSecondary}]}>
-          {isConnected ? 'Connected to LED Device' : 'No device connected'}
-        </Text>
-        <TouchableOpacity
+        {/* Header Section */}
+        <Animated.View
           style={[
-            styles.connectButton,
-            {backgroundColor: isConnected ? theme.colors.success : theme.colors.primary},
-          ]}
-          onPress={handleConnect}>
-          <Text style={styles.buttonText}>{isConnected ? 'Disconnect' : 'Connect Device'}</Text>
-        </TouchableOpacity>
-      </Animated.View>
-
-      {/* Power Control Card */}
-      <Animated.View
-        style={[
-          styles.card,
-          styles.controlCard,
-          {
-            opacity: fadeAnim,
-            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
-          },
-        ]}>
-        <View style={styles.cardHeader}>
-          <Icon name="power-settings-new" size={24} color={theme.colors.primary} />
-          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>Power Control</Text>
-        </View>
-
-        <TouchableOpacity
-          style={[
-            styles.powerButton,
+            styles.headerSection,
             {
-              backgroundColor: isOn ? theme.colors.success : theme.colors.error,
-              shadowColor: isOn ? theme.colors.success : theme.colors.error,
+              opacity: fadeAnim,
+              transform: [{translateY: slideAnim}],
             },
-          ]}
-          onPress={handlePowerToggle}
-          disabled={!isConnected}>
-          <Icon name={isOn ? 'power' : 'power-off'} size={32} color="#fff" />
-          <Text style={styles.powerButtonText}>{isOn ? 'ON' : 'OFF'}</Text>
-        </TouchableOpacity>
-      </Animated.View>
+          ]}>
+          <LinearGradient
+            colors={[theme.colors.primary, theme.colors.primaryDark]}
+            style={styles.headerGradient}
+            start={{x: 0, y: 0}}
+            end={{x: 1, y: 1}}>
+            <View style={styles.headerContent}>
+              <Icon name="lightbulb" size={32} color="#fff" />
+              <Text style={styles.headerTitle}>SmartLED Controller</Text>
+              <Text style={styles.headerSubtitle}>Control your LED lights with style</Text>
+            </View>
+          </LinearGradient>
+        </Animated.View>
 
-      {/* Brightness Control Card */}
-      <Animated.View
-        style={[
-          styles.card,
-          styles.controlCard,
-          {
-            opacity: fadeAnim,
-            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
-          },
-        ]}>
-        <View style={styles.cardHeader}>
-          <Icon name="brightness-6" size={24} color={theme.colors.primary} />
-          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>
-            Brightness: {brightness}%
+        {/* Connection Status Card */}
+        <Animated.View
+          style={[
+            styles.card,
+            styles.statusCard,
+            {
+              opacity: fadeAnim,
+              transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+            },
+          ]}>
+          <View style={styles.cardHeader}>
+            <Icon
+              name={isConnected ? 'bluetooth-connected' : 'bluetooth-disabled'}
+              size={24}
+              color={isConnected ? theme.colors.success : theme.colors.error}
+            />
+            <Text style={[styles.cardTitle, {color: theme.colors.text}]}>Device Status</Text>
+          </View>
+          <Text style={[styles.statusText, {color: theme.colors.textSecondary}]}>
+            {isConnected ? 'Connected to LED Device' : 'No device connected'}
           </Text>
-        </View>
-
-        <View style={styles.sliderContainer}>
-          <Icon name="brightness-1" size={20} color={theme.colors.textSecondary} />
-          <Slider
-            style={styles.slider}
-            minimumValue={0}
-            maximumValue={100}
-            value={brightness}
-            onValueChange={setBrightness}
-            onSlidingComplete={handleBrightnessChange}
-            minimumTrackTintColor={theme.colors.primary}
-            maximumTrackTintColor={theme.colors.textMuted}
-            thumbStyle={{backgroundColor: theme.colors.primary}}
-            disabled={!isConnected || !isOn}
-          />
-          <Icon name="brightness-7" size={20} color={theme.colors.textSecondary} />
-        </View>
-      </Animated.View>
-
-      {/* Color Control Card */}
-      <Animated.View
-        style={[
-          styles.card,
-          styles.colorCard,
-          {
-            opacity: fadeAnim,
-            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
-          },
-        ]}>
-        <View style={styles.cardHeader}>
-          <Icon name="palette" size={24} color={theme.colors.primary} />
-          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>Color Control</Text>
-        </View>
-
-        <View style={styles.colorPreviewContainer}>
-          <View style={[styles.colorPreview, {backgroundColor: currentColor}]} />
-          <Text style={[styles.colorText, {color: theme.colors.text}]}>
-            {currentColor.toUpperCase()}
-          </Text>
-        </View>
-
-        <TouchableOpacity
-          style={[styles.colorButton, {backgroundColor: theme.colors.primary}]}
-          onPress={() => navigation.navigate('ColorPicker')}
-          disabled={!isConnected || !isOn}>
-          <Icon name="color-lens" size={20} color="#fff" />
-          <Text style={styles.buttonText}>Choose Color</Text>
-        </TouchableOpacity>
-      </Animated.View>
-
-      {/* Quick Actions Card */}
-      <Animated.View
-        style={[
-          styles.card,
-          styles.actionsCard,
-          {
-            opacity: fadeAnim,
-            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
-          },
-        ]}>
-        <View style={styles.cardHeader}>
-          <Icon name="flash-on" size={24} color={theme.colors.primary} />
-          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>Quick Actions</Text>
-        </View>
-
-        <View style={styles.quickActionsGrid}>
           <TouchableOpacity
-            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('Effects')}>
-            <Icon name="auto-fix-high" size={24} color={theme.colors.primary} />
-            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Effects</Text>
+            style={[
+              styles.connectButton,
+              {backgroundColor: isConnected ? theme.colors.success : theme.colors.primary},
+            ]}
+            onPress={handleConnect}>
+            <Text style={styles.buttonText}>{isConnected ? 'Disconnect' : 'Connect Device'}</Text>
           </TouchableOpacity>
+        </Animated.View>
+
+        {/* Power Control Card */}
+        <Animated.View
+          style={[
+            styles.card,
+            styles.controlCard,
+            {
+              opacity: fadeAnim,
+              transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+            },
+          ]}>
+          <View style={styles.cardHeader}>
+            <Icon name="power-settings-new" size={24} color={theme.colors.primary} />
+            <Text style={[styles.cardTitle, {color: theme.colors.text}]}>Power Control</Text>
+          </View>
 
           <TouchableOpacity
-            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('Presets')}>
-            <Icon name="bookmark" size={24} color={theme.colors.primary} />
-            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Presets</Text>
+            style={[
+              styles.powerButton,
+              {
+                backgroundColor: isOn ? theme.colors.success : theme.colors.error,
+                shadowColor: isOn ? theme.colors.success : theme.colors.error,
+              },
+            ]}
+            onPress={handlePowerToggle}
+            disabled={!isConnected}>
+            <Icon name={isOn ? 'power' : 'power-off'} size={32} color="#fff" />
+            <Text style={styles.powerButtonText}>{isOn ? 'ON' : 'OFF'}</Text>
           </TouchableOpacity>
+        </Animated.View>
 
-          <TouchableOpacity
-            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('TextDisplay')}>
-            <Icon name="text-fields" size={24} color={theme.colors.primary} />
-            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Text</Text>
-          </TouchableOpacity>
+        {/* Brightness Control Card */}
+        <Animated.View
+          style={[
+            styles.card,
+            styles.controlCard,
+            {
+              opacity: fadeAnim,
+              transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+            },
+          ]}>
+          <View style={styles.cardHeader}>
+            <Icon name="brightness-6" size={24} color={theme.colors.primary} />
+            <Text style={[styles.cardTitle, {color: theme.colors.text}]}>
+              Brightness: {brightness}%
+            </Text>
+          </View>
 
-          <TouchableOpacity
-            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('ThemeSelection')}>
+          <View style={styles.sliderContainer}>
+            <Icon name="brightness-1" size={20} color={theme.colors.textSecondary} />
+            <Slider
+              style={styles.slider}
+              minimumValue={0}
+              maximumValue={100}
+              value={brightness}
+              onValueChange={setBrightness}
+              onSlidingComplete={handleBrightnessChange}
+              minimumTrackTintColor={theme.colors.primary}
+              maximumTrackTintColor={theme.colors.textMuted}
+              thumbStyle={{backgroundColor: theme.colors.primary}}
+              disabled={!isConnected || !isOn}
+            />
+            <Icon name="brightness-7" size={20} color={theme.colors.textSecondary} />
+          </View>
+        </Animated.View>
+
+        {/* Color Control Card */}
+        <Animated.View
+          style={[
+            styles.card,
+            styles.colorCard,
+            {
+              opacity: fadeAnim,
+              transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+            },
+          ]}>
+          <View style={styles.cardHeader}>
             <Icon name="palette" size={24} color={theme.colors.primary} />
-            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Themes</Text>
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
+            <Text style={[styles.cardTitle, {color: theme.colors.text}]}>Color Control</Text>
+          </View>
 
-      {/* Advanced Features Card */}
-      <Animated.View
-        style={[
-          styles.card,
-          styles.advancedCard,
-          {
-            opacity: fadeAnim,
-            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
-          },
-        ]}>
-        <View style={styles.cardHeader}>
-          <Icon name="settings" size={24} color={theme.colors.primary} />
-          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>Advanced Features</Text>
-        </View>
-
-        <View style={styles.advancedActions}>
-          <TouchableOpacity
-            style={[styles.advancedButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('AdvancedEffects')}>
-            <Icon name="auto-awesome" size={20} color={theme.colors.primary} />
-            <Text style={[styles.advancedButtonText, {color: theme.colors.text}]}>
-              Advanced Effects
+          <View style={styles.colorPreviewContainer}>
+            <View style={[styles.colorPreview, {backgroundColor: currentColor}]} />
+            <Text style={[styles.colorText, {color: theme.colors.text}]}>
+              {currentColor.toUpperCase()}
             </Text>
-          </TouchableOpacity>
+          </View>
 
           <TouchableOpacity
-            style={[styles.advancedButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('MusicReactive')}>
-            <Icon name="music-note" size={20} color={theme.colors.primary} />
-            <Text style={[styles.advancedButtonText, {color: theme.colors.text}]}>
-              Music Reactive
-            </Text>
+            style={[styles.colorButton, {backgroundColor: theme.colors.primary}]}
+            onPress={() => navigation.navigate('ColorPicker')}
+            disabled={!isConnected || !isOn}>
+            <Icon name="color-lens" size={20} color="#fff" />
+            <Text style={styles.buttonText}>Choose Color</Text>
           </TouchableOpacity>
+        </Animated.View>
 
-          <TouchableOpacity
-            style={[styles.advancedButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('Scheduling')}>
-            <Icon name="schedule" size={20} color={theme.colors.primary} />
-            <Text style={[styles.advancedButtonText, {color: theme.colors.text}]}>Scheduling</Text>
-          </TouchableOpacity>
+        {/* Quick Actions Card */}
+        <Animated.View
+          style={[
+            styles.card,
+            styles.actionsCard,
+            {
+              opacity: fadeAnim,
+              transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+            },
+          ]}>
+          <View style={styles.cardHeader}>
+            <Icon name="flash-on" size={24} color={theme.colors.primary} />
+            <Text style={[styles.cardTitle, {color: theme.colors.text}]}>Quick Actions</Text>
+          </View>
 
-          <TouchableOpacity
-            style={[styles.advancedButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('DeviceManagement')}>
-            <Icon name="devices" size={20} color={theme.colors.primary} />
-            <Text style={[styles.advancedButtonText, {color: theme.colors.text}]}>
-              Device Management
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
+          <View style={styles.quickActionsGrid}>
+            <TouchableOpacity
+              style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('Effects')}>
+              <Icon name="auto-fix-high" size={24} color={theme.colors.primary} />
+              <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Effects</Text>
+            </TouchableOpacity>
 
-      {/* Bottom Spacing */}
-      <View style={styles.bottomSpacing} />
-    </ScrollView>
+            <TouchableOpacity
+              style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('Presets')}>
+              <Icon name="bookmark" size={24} color={theme.colors.primary} />
+              <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Presets</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('TextDisplay')}>
+              <Icon name="text-fields" size={24} color={theme.colors.primary} />
+              <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Text</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('ThemeSelection')}>
+              <Icon name="palette" size={24} color={theme.colors.primary} />
+              <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Themes</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+
+        {/* Advanced Features Card */}
+        <Animated.View
+          style={[
+            styles.card,
+            styles.advancedCard,
+            {
+              opacity: fadeAnim,
+              transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+            },
+          ]}>
+          <View style={styles.cardHeader}>
+            <Icon name="settings" size={24} color={theme.colors.primary} />
+            <Text style={[styles.cardTitle, {color: theme.colors.text}]}>Advanced Features</Text>
+          </View>
+
+          <View style={styles.advancedActions}>
+            <TouchableOpacity
+              style={[styles.advancedButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('AdvancedEffects')}>
+              <Icon name="auto-awesome" size={20} color={theme.colors.primary} />
+              <Text style={[styles.advancedButtonText, {color: theme.colors.text}]}>
+                Advanced Effects
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.advancedButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('MusicReactive')}>
+              <Icon name="music-note" size={20} color={theme.colors.primary} />
+              <Text style={[styles.advancedButtonText, {color: theme.colors.text}]}>
+                Music Reactive
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.advancedButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('Scheduling')}>
+              <Icon name="schedule" size={20} color={theme.colors.primary} />
+              <Text style={[styles.advancedButtonText, {color: theme.colors.text}]}>
+                Scheduling
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={[styles.advancedButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('DeviceManagement')}>
+              <Icon name="devices" size={20} color={theme.colors.primary} />
+              <Text style={[styles.advancedButtonText, {color: theme.colors.text}]}>
+                Device Management
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
+
+        {/* Bottom Spacing */}
+        <View style={styles.bottomSpacing} />
+      </ScrollView>
+
+      {/* Safety Disclaimer Modal */}
+      <SafetyDisclaimer
+        visible={showSafetyDisclaimer}
+        onAccept={() => {
+          setShowSafetyDisclaimer(false);
+          if (pendingAction) {
+            pendingAction();
+            setPendingAction(null);
+          }
+        }}
+        onDecline={() => {
+          setShowSafetyDisclaimer(false);
+          setPendingAction(null);
+        }}
+      />
+    </>
   );
 };
 
