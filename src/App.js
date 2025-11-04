@@ -21,7 +21,7 @@ import AnalyticsScreen from '../screens/AnalyticsScreen';
 import ThemeSelectionScreen from '../screens/ThemeSelectionScreen';
 import EnhancedColorPickerScreen from '../screens/EnhancedColorPickerScreen';
 import EnhancedTextDisplayScreen from '../screens/EnhancedTextDisplayScreen';
-import LegalAgreementScreen from '../screens/LegalAgreementScreen';
+import LegalAgreementScreen, {checkLegalAcceptance} from '../screens/LegalAgreementScreen';
 
 import logger from '../utils/Logger';
 
@@ -203,9 +203,9 @@ export class App extends Component {
    */
   async checkLegalAgreements() {
     try {
-      // In a real app, you would check AsyncStorage or a secure storage
-      // For now, we'll return false to always show the agreement screen
-      return false;
+      const hasAccepted = await checkLegalAcceptance();
+      logger.info('Legal agreement status checked', {hasAccepted});
+      return hasAccepted;
     } catch (error) {
       logger.error('Failed to check legal agreements', error);
       return false;

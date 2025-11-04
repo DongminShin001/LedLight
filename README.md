@@ -1,285 +1,512 @@
 # SmartLED Controller
 
-A professional-grade React Native application for controlling LED lighting systems via Bluetooth connectivity. Designed for smart home automation and commercial lighting applications.
+<div align="center">
 
-## 🚀 Features
+![SmartLED Logo](https://via.placeholder.com/200x200.png/00ff88/000000?text=SmartLED)
 
-- **Professional Bluetooth LED Control**: Connect and control LED devices wirelessly with enterprise-grade reliability
-- **Advanced Color Management**: Full RGB color picker with hex color support and color temperature control
-- **Precise Brightness Control**: Smooth brightness adjustment from 0-100% with fade transitions
-- **Rich LED Effects Library**: Multiple built-in effects including Rainbow, Breathing, Strobe, Music Sync, and more
-- **Custom Preset Management**: Save, organize, and share custom LED configurations
-- **Smart Home Integration**: Compatible with popular smart home platforms and protocols
-- **Commercial-Grade Settings**: Comprehensive app settings for professional lighting control
-- **Robust Error Handling**: Enterprise-level error handling with user-friendly messages and automatic recovery
-- **Performance Optimized**: Debounced controls, memory management, and smooth 60fps animations
-- **Security First**: Encrypted local storage, input validation, and secure Bluetooth communication
-- **Comprehensive Testing**: 80%+ test coverage with Jest and React Native Testing Library
-- **App Store Ready**: Fully compliant with iOS App Store and Google Play Store requirements
+**Professional LED Lighting Control via Bluetooth**
 
-## 📱 Screenshots
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+[![React Native](https://img.shields.io/badge/React_Native-0.72.6-61DAFB.svg)](https://reactnative.dev/)
+[![iOS](https://img.shields.io/badge/iOS-12.0+-000000.svg)](https://www.apple.com/ios/)
+[![Android](https://img.shields.io/badge/Android-5.0+-3DDC84.svg)](https://www.android.com/)
 
-The app features a modern dark theme with intuitive controls:
+[Features](#features) • [Installation](#installation) • [Usage](#usage) • [Safety](#safety) • [License](#license)
 
-- Home screen with LED preview and power controls
-- Color picker for custom color selection
-- Effects screen with animated effect cards
-- Presets management
-- Settings with comprehensive options
+</div>
 
-## 🛠️ Technology Stack
+---
 
-- **React Native 0.72.6**: Cross-platform mobile development
-- **React Navigation 6**: Navigation and routing
-- **React Native Bluetooth Classic**: Bluetooth connectivity
-- **React Native Vector Icons**: Icon library
-- **React Native Linear Gradient**: Gradient backgrounds
-- **Jest**: Testing framework
-- **ESLint & Prettier**: Code quality and formatting
-- **TypeScript**: Type safety (optional)
+## 🎯 Overview
 
-## 📋 Prerequisites
+SmartLED Controller is a professional-grade mobile application for controlling LED lighting devices via Bluetooth. Designed for both smart home enthusiasts and commercial lighting professionals, it provides comprehensive control over RGB LED systems with an intuitive interface and robust safety features.
 
-- Node.js >= 16.0.0
-- npm >= 8.0.0
-- React Native CLI
-- Android Studio (for Android development)
-- Xcode (for iOS development)
-- Bluetooth-enabled device for testing
+### ✨ Key Highlights
+
+- 🔌 **Bluetooth LED Control** - Wireless control of compatible LED devices
+- 🎨 **Full RGB Color Picker** - Precise color selection with hex support
+- 💡 **Brightness Control** - Smooth 0-100% brightness adjustment
+- ✨ **Multiple Effects** - Rainbow, breathing, strobe, and custom animations
+- 💾 **Custom Presets** - Save and manage favorite lighting configurations
+- 🛡️ **Comprehensive Safety** - Multiple warnings and legal protections
+- 📱 **Modern UI** - Beautiful, responsive interface with dark theme
+- ⚡ **High Performance** - Optimized for smooth operation
+
+---
+
+## 📱 Features
+
+### Core Functionality
+
+#### LED Device Control
+- **Bluetooth Connectivity**: Discover and connect to LED controllers
+- **Real-time Control**: Instant response to color and brightness changes
+- **Multiple Device Support**: Manage multiple LED devices
+- **Connection Management**: Auto-reconnect and connection status monitoring
+
+#### Color Management
+- **RGB Color Picker**: Full spectrum color selection
+- **Hex Color Input**: Direct hex code entry
+- **Color Presets**: Quick access to common colors
+- **Color History**: Remember recently used colors
+
+#### Lighting Effects
+- **Rainbow**: Smooth spectrum cycling
+- **Breathing**: Gentle fade in/out
+- **Strobe**: Adjustable flash rate
+- **Fade**: Smooth color transitions
+- **Custom Effects**: Create your own patterns
+
+#### Advanced Features
+- **Schedules**: Set automatic on/off times
+- **Music Reactive**: Sync lights to music (coming soon)
+- **Device Groups**: Control multiple devices together
+- **Text Display**: Show scrolling text on LED matrices
+
+### Safety Features
+
+#### Electrical Safety
+- ⚠️ **Professional Installation Required** - All installations must be performed by licensed electricians
+- 🔐 **Safety Warnings** - Multiple confirmations before device control
+- 📋 **Legal Protections** - Comprehensive terms and liability protections
+- 🚨 **Emergency Procedures** - Clear instructions for hazardous situations
+
+#### App Security
+- 🔒 **Secure Connections** - Bluetooth pairing security
+- 🛡️ **Input Validation** - All commands validated before sending
+- 📊 **Error Handling** - Comprehensive error management
+- 🔍 **Permission Management** - Proper Bluetooth permission handling
+
+---
 
 ## 🚀 Installation
 
-1. **Clone the repository**
+### Prerequisites
 
-   ```bash
-   git clone https://github.com/yourusername/ledlight-app.git
-   cd ledlight-app
-   ```
+**For Users:**
+- iOS 12.0+ or Android 5.0+
+- Bluetooth-enabled device
+- Compatible LED controller hardware
+- **Licensed electrician for installation**
 
-2. **Install dependencies**
+**For Developers:**
+- Node.js 16+ and npm 8+
+- React Native CLI
+- Xcode 12+ (for iOS development)
+- Android Studio (for Android development)
 
-   ```bash
-   npm install
-   ```
+### User Installation
 
-3. **iOS Setup** (macOS only)
+#### iOS (App Store)
+```bash
+# Coming soon to App Store
+# Search for "SmartLED Controller"
+```
 
-   ```bash
-   cd ios && pod install && cd ..
-   ```
+#### Android (Google Play)
+```bash
+# Coming soon to Google Play
+# Search for "SmartLED Controller"
+```
 
-4. **Android Setup**
-   - Ensure Android SDK is installed
-   - Set up Android emulator or connect physical device
-
-## 🏃‍♂️ Running the App
-
-### Development Mode
+### Developer Setup
 
 ```bash
-# Start Metro bundler
-npm start
+# Clone the repository
+git clone https://github.com/DongminShin001/LedLight.git
+cd LedLight
 
-# Run on Android
-npm run android
+# Install dependencies
+npm install
+
+# iOS: Install pods
+cd ios && pod install && cd ..
 
 # Run on iOS
 npm run ios
+
+# Run on Android
+npm run android
 ```
 
-### Production Build
+---
 
-```bash
-# Build Android APK
-npm run build:android
+## 📖 Usage
 
-# Build iOS Archive
-npm run build:ios
+### First-Time Setup
+
+1. **Accept Legal Agreement**
+   - Read and accept Terms of Service on first launch
+   - Review safety warnings carefully
+   - Confirm professional installation
+
+2. **Enable Bluetooth**
+   - Grant Bluetooth permissions
+   - Enable Bluetooth on your device
+   - Ensure LED controller is powered on
+
+3. **Connect to Device**
+   - Tap "Connect Device" on home screen
+   - Select your LED controller from the list
+   - Wait for connection confirmation
+
+### Basic Operations
+
+#### Turning On/Off
 ```
+1. Open app
+2. Ensure device is connected
+3. Read safety confirmation
+4. Tap the power button
+5. Confirm action
+```
+
+#### Changing Colors
+```
+1. Tap "Choose Color" button
+2. Select color from picker
+3. Or enter hex code directly
+4. Changes apply immediately
+```
+
+#### Adjusting Brightness
+```
+1. Use brightness slider
+2. Drag to desired level (0-100%)
+3. Changes apply in real-time
+```
+
+#### Applying Effects
+```
+1. Navigate to "Effects" tab
+2. Browse available effects
+3. Tap to apply
+4. Adjust speed/intensity as needed
+```
+
+#### Saving Presets
+```
+1. Configure desired settings
+2. Navigate to "Presets" tab
+3. Tap "Save Preset"
+4. Name and save
+```
+
+---
+
+## ⚡ Safety Information
+
+### 🚨 CRITICAL WARNINGS
+
+**THIS APP CONTROLS ELECTRICAL DEVICES**
+
+Improper use can cause:
+- **FIRE**
+- **ELECTRIC SHOCK**
+- **PROPERTY DAMAGE**
+- **PERSONAL INJURY**
+- **DEATH**
+
+### ✅ Requirements
+
+**BEFORE USING THIS APP:**
+
+1. ✓ All LED installations performed by **licensed electricians**
+2. ✓ All work complies with **local electrical codes**
+3. ✓ Proper **circuit protection** installed
+4. ✓ Equipment within **rated specifications**
+5. ✓ Regular **inspections** performed
+
+### 🚫 Prohibited Uses
+
+**DO NOT USE FOR:**
+- Medical devices or life-support systems
+- Safety-critical applications (emergency lighting)
+- Any use where failure could cause injury/death
+- Installations not approved by professionals
+
+### 🆘 Emergency Procedures
+
+**IMMEDIATELY DISCONNECT POWER IF:**
+- Smoke or burning smell
+- Unusual heat
+- Sparking or arcing
+- Physical damage
+- Water exposure
+
+**IN CASE OF FIRE: CALL 911**
+
+---
+
+## 🏗️ Technical Architecture
+
+### Design Patterns
+
+The app implements professional OOP and design patterns:
+
+- **Factory Pattern**: Screen and navigation creation
+- **Observer Pattern**: Theme and event management
+- **Strategy Pattern**: Effect algorithms
+- **Command Pattern**: LED control commands
+- **Singleton Pattern**: Device and theme managers
+- **Repository Pattern**: Data persistence
+- **Chain of Responsibility**: Error handling
+
+### Tech Stack
+
+- **Framework**: React Native 0.72.6
+- **Navigation**: React Navigation 6.x
+- **State Management**: React hooks + Context
+- **Bluetooth**: react-native-bluetooth-classic
+- **Storage**: AsyncStorage
+- **UI Components**: react-native-linear-gradient, react-native-vector-icons
+- **Testing**: Jest + React Native Testing Library
+
+### Project Structure
+
+```
+src/
+├── App.js                 # Main app entry
+├── classes/               # Core business logic
+│   ├── LEDController.js   # LED device control
+│   ├── DeviceManager.js   # Bluetooth device management
+│   └── ColorManager.js    # Color manipulation
+├── components/            # Reusable UI components
+│   ├── SafetyDisclaimer.js
+│   └── SplashScreen.js
+├── screens/               # App screens
+│   ├── HomeScreen.js
+│   ├── LegalAgreementScreen.js
+│   └── [other screens]
+├── services/              # External services
+│   ├── BluetoothService.js
+│   └── AnalyticsManager.js
+├── theme/                 # Theming system
+├── utils/                 # Utilities
+└── patterns/              # Design pattern implementations
+```
+
+---
 
 ## 🧪 Testing
 
+### Run Tests
+
 ```bash
-# Run all tests
+# Unit tests
 npm test
 
-# Run tests in watch mode
-npm run test:watch
+# Integration tests
+npm run test:integration
 
-# Generate coverage report
+# E2E tests
+npm run test:e2e
+
+# Coverage
 npm run test:coverage
 ```
 
-## 🔧 Code Quality
+### Test Coverage
+
+- Unit Tests: 80%+ coverage
+- Integration Tests: Core flows covered
+- E2E Tests: Critical user journeys
+
+---
+
+## 🔒 Privacy & Legal
+
+### Privacy
+- **Minimal data collection** - Only what's needed for functionality
+- **Local storage** - Data stays on your device
+- **No data selling** - We never sell your information
+- **GDPR/CCPA compliant** - Full privacy rights
+
+[Read Full Privacy Policy](LEGAL/UPDATED_PRIVACY_POLICY.md)
+
+### Legal Protection
+- **Zero liability** - Developers not responsible for damages
+- **No warranties** - App provided "AS IS"
+- **Arbitration** - Disputes resolved through arbitration
+- **User responsibility** - You accept all risks
+
+[Read Full Terms of Service](LEGAL/UPDATED_TERMS_OF_SERVICE.md)
+
+---
+
+## 🛠️ Development
+
+### Build for Production
+
+#### iOS
+```bash
+# Build release
+cd ios
+xcodebuild -workspace LedLight.xcworkspace \
+  -scheme LedLight \
+  -configuration Release \
+  -archivePath LedLight.xcarchive archive
+```
+
+#### Android
+```bash
+# Build APK
+cd android
+./gradlew assembleRelease
+
+# Build AAB (for Play Store)
+./gradlew bundleRelease
+```
+
+### Code Quality
 
 ```bash
 # Lint code
 npm run lint
 
-# Fix linting issues
-npm run lint:fix
-
 # Format code
 npm run format
 
-# Check formatting
-npm run format:check
+# Security check
+npm run security-check
 
-# Type checking (if using TypeScript)
+# Type check
 npm run type-check
 ```
 
-## 📁 Project Structure
+---
 
-```
-src/
-├── screens/           # App screens
-│   ├── HomeScreen.js
-│   ├── ColorPickerScreen.js
-│   ├── EffectsScreen.js
-│   ├── PresetsScreen.js
-│   └── SettingsScreen.js
-├── services/          # Business logic
-│   └── BluetoothService.js
-├── utils/             # Utility functions
-│   ├── ErrorHandler.js
-│   ├── Logger.js
-│   ├── PerformanceUtils.js
-│   ├── SecurityUtils.js
-│   ├── testSetup.js
-│   └── testUtils.js
-└── App.js             # Main app component
-```
+## 📦 Dependencies
 
-## 🔌 Bluetooth Integration
+### Main Dependencies
+- `react-native`: ^0.72.6
+- `@react-navigation/native`: ^6.1.9
+- `react-native-bluetooth-classic`: ^1.60.0-rc.5
+- `react-native-linear-gradient`: ^2.8.3
+- `@react-native-async-storage/async-storage`: ^1.19.0
 
-The app uses `react-native-bluetooth-classic` for Bluetooth connectivity:
-
-### Supported Commands
-
-- `POWER_ON/POWER_OFF`: Control LED power
-- `COLOR:r,g,b`: Set RGB color values
-- `BRIGHTNESS:value`: Set brightness (0-100)
-- `EFFECT:name:speed`: Apply LED effects
-- `PRESET:name`: Load saved presets
-
-### Device Requirements
-
-- Bluetooth Classic (not BLE)
-- Device name must contain "LED" (case-insensitive)
-- Must be paired with the mobile device
-
-## 🛡️ Security Features
-
-- **Input Validation**: All user inputs are validated and sanitized
-- **Encrypted Storage**: Sensitive data is encrypted using AES encryption
-- **Rate Limiting**: Prevents abuse with configurable rate limits
-- **Session Management**: Secure session handling with timeouts
-- **Audit Logging**: Security event logging for monitoring
-- **Device Security**: Basic device security checks
-
-## ⚡ Performance Features
-
-- **Debounced Controls**: Prevents excessive API calls
-- **Memory Management**: Automatic cleanup and optimization
-- **Lazy Loading**: Components load only when needed
-- **Image Optimization**: Automatic image size optimization
-- **Performance Monitoring**: Built-in performance metrics
-
-## 🐛 Error Handling
-
-The app includes comprehensive error handling:
-
-- **Custom Error Classes**: Specific error types for different scenarios
-- **User-Friendly Messages**: Clear error messages for users
-- **Retry Logic**: Automatic retry for failed operations
-- **Error Boundaries**: React error boundaries for UI errors
-- **Logging**: Detailed error logging for debugging
-
-## 📊 Testing Strategy
-
-- **Unit Tests**: Individual component and utility testing
-- **Integration Tests**: Service integration testing
-- **Mocking**: Comprehensive mocking of native modules
-- **Coverage**: 80%+ code coverage requirement
-- **E2E Testing**: End-to-end testing with Detox (optional)
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Copy `.env.example` to `.env` and configure:
-
-```env
-APP_NAME=LedLight
-APP_VERSION=1.0.0
-DEBUG_MODE=true
-BLUETOOTH_SCAN_TIMEOUT=10000
-LED_COMMAND_TIMEOUT=2000
-```
-
-### Build Configuration
-
-- **Android**: Configured in `android/app/build.gradle`
-- **iOS**: Configured in `ios/LedLight/Info.plist`
-
-## 🚀 Deployment
-
-### Android Play Store
-
-1. Generate signed APK: `npm run build:android`
-2. Upload to Play Console
-3. Configure app listing and metadata
-
-### iOS App Store
-
-1. Build archive: `npm run build:ios`
-2. Upload via Xcode or Application Loader
-3. Configure app listing in App Store Connect
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/new-feature`
-3. Commit changes: `git commit -am 'Add new feature'`
-4. Push to branch: `git push origin feature/new-feature`
-5. Submit a Pull Request
-
-### Development Guidelines
-
-- Follow ESLint and Prettier configurations
-- Write tests for new features
-- Update documentation as needed
-- Follow conventional commit messages
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 🆘 Support
-
-For support and questions:
-
-- Create an issue on GitHub
-- Check the documentation
-- Review the test files for usage examples
-
-## 🔮 Roadmap
-
-- [ ] Cloud sync for presets
-- [ ] Music-reactive effects
-- [ ] Multiple device support
-- [ ] Widget support
-- [ ] Apple Watch companion app
-- [ ] Advanced scheduling features
-
-## 🙏 Acknowledgments
-
-- React Native community
-- Bluetooth Classic library contributors
-- Testing library maintainers
-- Open source contributors
+### See full list in `package.json`
 
 ---
 
-**Made with ❤️ for LED enthusiasts**
+## 🤝 Contributing
+
+We welcome contributions! However, due to the safety-critical nature of this app, all contributions must be carefully reviewed.
+
+### Guidelines
+1. **Safety First** - Never compromise safety features
+2. **Code Quality** - Follow existing patterns and standards
+3. **Testing** - Include tests for new features
+4. **Documentation** - Update docs for changes
+
+### Process
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Add tests
+5. Submit pull request
+6. Wait for review
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+### Third-Party Licenses
+All third-party libraries are properly licensed. See `package.json` for details.
+
+---
+
+## 🆘 Support
+
+### Getting Help
+
+- **Documentation**: Check this README and [LEGAL/](LEGAL/) folder
+- **Issues**: [GitHub Issues](https://github.com/DongminShin001/LedLight/issues)
+- **Email**: support@smartledcontroller.com (coming soon)
+
+### FAQ
+
+**Q: What LED controllers are compatible?**  
+A: Currently supports Bluetooth Classic LED controllers. Check your device specifications.
+
+**Q: Do I need an electrician?**  
+A: **YES**. All electrical installations must be performed by licensed electricians.
+
+**Q: Is the app free?**  
+A: Yes, the app is free to download and use.
+
+**Q: What if something goes wrong?**  
+A: Immediately disconnect power and call a licensed electrician. Do not attempt repairs yourself.
+
+**Q: Can I use this for commercial purposes?**  
+A: Yes, but ensure all installations meet commercial electrical codes and regulations.
+
+---
+
+## 🗺️ Roadmap
+
+### Version 1.0 (Current)
+- ✅ Bluetooth LED control
+- ✅ RGB color picker
+- ✅ Multiple effects
+- ✅ Custom presets
+- ✅ Safety features
+
+### Version 1.1 (Planned)
+- 🔲 Music reactive mode
+- 🔲 Additional effects
+- 🔲 Cloud sync
+- 🔲 Widget support
+
+### Version 2.0 (Future)
+- 🔲 Matter protocol support
+- 🔲 HomeKit integration
+- 🔲 Voice control
+- 🔲 Automation scenes
+
+---
+
+## 👥 Team
+
+**SmartLED Technologies**
+
+- Main Developer: [DongminShin001](https://github.com/DongminShin001)
+
+---
+
+## 🙏 Acknowledgments
+
+- React Native Community
+- Open Source Contributors
+- Beta Testers
+- Electrical Safety Professionals
+
+---
+
+## ⚠️ Disclaimer
+
+**THIS APP CONTROLS ELECTRICAL DEVICES. USE AT YOUR OWN RISK.**
+
+The developers are NOT responsible for:
+- Property damage
+- Personal injury
+- Fire or electrical hazards
+- Any other damages
+
+**YOU ACCEPT ALL RISKS BY USING THIS APP.**
+
+See [LEGAL/LIABILITY_DISCLAIMER.md](LEGAL/LIABILITY_DISCLAIMER.md) for complete disclaimer.
+
+---
+
+<div align="center">
+
+Made with ⚡ by SmartLED Technologies
+
+**[Get Started](#installation)** • **[Report Bug](https://github.com/DongminShin001/LedLight/issues)** • **[Request Feature](https://github.com/DongminShin001/LedLight/issues)**
+
+© 2024 SmartLED Technologies. All Rights Reserved.
+
+</div>
