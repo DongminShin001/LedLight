@@ -389,58 +389,58 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </Animated.View>
 
-      {/* Quick Actions Card */}
-      <Animated.View
-        style={[
-          styles.card,
-          styles.actionsCard,
-          {
-            opacity: fadeAnim,
-            transform: [{translateY: slideAnim}, {scale: scaleAnim}],
-          },
-        ]}>
-        <View style={styles.cardHeader}>
-          <Icon name="flash-on" size={24} color={theme.colors.primary} />
-          <Text style={[styles.cardTitle, {color: theme.colors.text}]}>Quick Actions</Text>
-        </View>
+        {/* Quick Actions Card */}
+        <Animated.View
+          style={[
+            styles.card,
+            styles.actionsCard,
+            {
+              opacity: fadeAnim,
+              transform: [{translateY: slideAnim}, {scale: scaleAnim}],
+            },
+          ]}>
+          <View style={styles.cardHeader}>
+            <Icon name="flash-on" size={24} color={theme.colors.primary} />
+            <Text style={[styles.cardTitle, {color: theme.colors.text}]}>Quick Actions</Text>
+          </View>
 
-        <View style={styles.quickActionsGrid}>
-          <TouchableOpacity
-            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('DirectionalEffects')}>
-            <Icon name="arrow-forward" size={24} color={theme.colors.primary} />
-            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Running</Text>
-          </TouchableOpacity>
+          <View style={styles.quickActionsGrid}>
+            <TouchableOpacity
+              style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('DirectionalEffects')}>
+              <Icon name="arrow-forward" size={24} color={theme.colors.primary} />
+              <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Running</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('Effects')}>
-            <Icon name="auto-fix-high" size={24} color={theme.colors.primary} />
-            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Effects</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('Effects')}>
+              <Icon name="auto-fix-high" size={24} color={theme.colors.primary} />
+              <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Effects</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('Presets')}>
-            <Icon name="bookmark" size={24} color={theme.colors.primary} />
-            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Presets</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('Presets')}>
+              <Icon name="bookmark" size={24} color={theme.colors.primary} />
+              <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Presets</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('TextDisplay')}>
-            <Icon name="text-fields" size={24} color={theme.colors.primary} />
-            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Text</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('TextDisplay')}>
+              <Icon name="text-fields" size={24} color={theme.colors.primary} />
+              <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Text</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
-            onPress={() => navigation.navigate('ThemeSelection')}>
-            <Icon name="palette" size={24} color={theme.colors.primary} />
-            <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Themes</Text>
-          </TouchableOpacity>
-        </View>
-      </Animated.View>
+            <TouchableOpacity
+              style={[styles.quickActionButton, {backgroundColor: theme.colors.surface}]}
+              onPress={() => navigation.navigate('ThemeSelection')}>
+              <Icon name="palette" size={24} color={theme.colors.primary} />
+              <Text style={[styles.quickActionText, {color: theme.colors.text}]}>Themes</Text>
+            </TouchableOpacity>
+          </View>
+        </Animated.View>
 
         {/* Advanced Features Card */}
         <Animated.View
