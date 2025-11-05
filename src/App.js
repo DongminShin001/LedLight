@@ -21,6 +21,7 @@ import AnalyticsScreen from '../screens/AnalyticsScreen';
 import ThemeSelectionScreen from '../screens/ThemeSelectionScreen';
 import EnhancedColorPickerScreen from '../screens/EnhancedColorPickerScreen';
 import EnhancedTextDisplayScreen from '../screens/EnhancedTextDisplayScreen';
+import DirectionalEffectsScreen from '../screens/DirectionalEffectsScreen';
 import LegalAgreementScreen, {checkLegalAcceptance} from '../screens/LegalAgreementScreen';
 
 import logger from '../utils/Logger';
@@ -270,6 +271,7 @@ export class App extends Component {
       {name: 'HomeMain', component: HomeScreen, options: {headerShown: false}},
       {name: 'ColorPicker', component: EnhancedColorPickerScreen, options: {headerShown: false}},
       {name: 'TextDisplay', component: EnhancedTextDisplayScreen, options: {headerShown: false}},
+      {name: 'DirectionalEffects', component: DirectionalEffectsScreen, options: {headerShown: false}},
       {name: 'AdvancedEffects', component: AdvancedEffectsScreen, options: {headerShown: false}},
       {name: 'MusicReactive', component: MusicReactiveScreen, options: {headerShown: false}},
       {name: 'Scheduling', component: SchedulingScreen, options: {headerShown: false}},
