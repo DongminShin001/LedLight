@@ -20,6 +20,8 @@ import {ErrorHandler} from '../utils/ErrorHandler';
 import logger from '../utils/Logger';
 import {useTheme} from '../hooks/useTheme';
 import SafetyDisclaimer, {shouldShowDisclaimer} from '../components/SafetyDisclaimer';
+import haptic from '../utils/HapticFeedback';
+import {ToastManager} from '../components/Toast';
 
 const {width, height} = Dimensions.get('window');
 
@@ -147,6 +149,7 @@ const HomeScreen = () => {
   const executePowerToggle = async () => {
     try {
       const newPowerState = !isOn;
+      haptic.medium(); // Haptic feedback
 
       // Additional safety confirmation for turning ON
       if (newPowerState) {
@@ -158,18 +161,22 @@ const HomeScreen = () => {
             '• Confirm proper circuit protection is in place\n\n' +
             'Continue?',
           [
-            {text: 'Cancel', style: 'cancel'},
+            {text: 'Cancel', style: 'cancel', onPress: () => haptic.light()},
             {
               text: 'Turn ON',
               style: 'default',
               onPress: async () => {
                 try {
+                  haptic.heavy();
                   await LEDController.setPower(newPowerState);
                   setIsOn(newPowerState);
                   logger.info('Power toggled', {isOn: newPowerState});
+                  ToastManager.success('LED lights turned ON');
                 } catch (error) {
                   logger.error('Failed to toggle power', error);
+                  haptic.error();
                   const userMessage = ErrorHandler.getUserFriendlyMessage(error);
+                  ToastManager.error(userMessage);
                   Alert.alert('Power Control Error', userMessage);
                 }
               },
@@ -178,13 +185,17 @@ const HomeScreen = () => {
         );
       } else {
         // Turning OFF doesn't need extra confirmation
+        haptic.heavy();
         await LEDController.setPower(newPowerState);
         setIsOn(newPowerState);
         logger.info('Power toggled', {isOn: newPowerState});
+        ToastManager.info('LED lights turned OFF');
       }
     } catch (error) {
       logger.error('Failed to toggle power', error);
+      haptic.error();
       const userMessage = ErrorHandler.getUserFriendlyMessage(error);
+      ToastManager.error(userMessage);
       Alert.alert('Power Control Error', userMessage);
     }
   };
@@ -194,32 +205,48 @@ const HomeScreen = () => {
       await LEDController.setBrightness(value);
       setBrightness(value);
       logger.info('Brightness changed', {brightness: value});
+      // Light haptic at 0%, 25%, 50%, 75%, 100%
+      if (value % 25 === 0) {
+        haptic.soft();
+      }
     } catch (error) {
       logger.error('Failed to change brightness', error);
+      haptic.error();
       const userMessage = ErrorHandler.getUserFriendlyMessage(error);
+      ToastManager.error(userMessage);
       Alert.alert('Brightness Control Error', userMessage);
     }
   };
 
   const handleColorPress = () => {
+    haptic.light();
     navigation.navigate('ColorPicker');
   };
 
   const handleConnect = async () => {
     try {
+      haptic.light(); // Haptic feedback on button press
+      
       if (isConnected) {
         await DeviceManager.disconnect();
         setIsConnected(false);
         setConnectionState('disconnected');
         logger.info('Device disconnected');
+        haptic.medium();
+        ToastManager.info('Device disconnected');
       } else {
+        ToastManager.info('Connecting to device...');
         await DeviceManager.connect();
         // Connection state will be updated via event listener
         logger.info('Attempting to connect to device');
+        haptic.success();
+        ToastManager.success('Device connected successfully!');
       }
     } catch (error) {
       logger.error('Connection error', error);
+      haptic.error();
       const userMessage = ErrorHandler.getUserFriendlyMessage(error);
+      ToastManager.error(userMessage);
       Alert.alert('Connection Error', userMessage);
     }
   };

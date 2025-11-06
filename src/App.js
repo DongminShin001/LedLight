@@ -23,6 +23,8 @@ import EnhancedColorPickerScreen from '../screens/EnhancedColorPickerScreen';
 import EnhancedTextDisplayScreen from '../screens/EnhancedTextDisplayScreen';
 import DirectionalEffectsScreen from '../screens/DirectionalEffectsScreen';
 import LegalAgreementScreen, {checkLegalAcceptance} from '../screens/LegalAgreementScreen';
+import OnboardingTutorial, {shouldShowOnboarding} from '../components/OnboardingTutorial';
+import Toast, {ToastManager} from '../components/Toast';
 
 import logger from '../utils/Logger';
 
@@ -40,6 +42,10 @@ export class App extends Component {
       theme: null,
       isInitialized: false,
       legalAgreementsAccepted: false,
+      showOnboarding: false,
+      toastVisible: false,
+      toastMessage: '',
+      toastType: 'info',
     };
 
     // Initialize managers
@@ -63,6 +69,15 @@ export class App extends Component {
    */
   async componentDidMount() {
     try {
+      // Set up toast manager
+      ToastManager.show = (message, type) => {
+        this.setState({
+          toastVisible: true,
+          toastMessage: message,
+          toastType: type,
+        });
+      };
+
       await this.initializeApp();
     } catch (error) {
       this.handleError(error);
@@ -93,18 +108,23 @@ export class App extends Component {
       // Set up theme change listener
       this.setupThemeListener();
 
+      // Check if onboarding should be shown
+      const needsOnboarding = await shouldShowOnboarding();
+
       // Update state
       this.setState({
         isLoading: false,
         theme: currentTheme,
         isInitialized: true,
         legalAgreementsAccepted: agreementsAccepted,
+        showOnboarding: agreementsAccepted && needsOnboarding, // Only show if legal accepted
       });
 
       logger.info('Application initialized successfully', {
         themeId: currentTheme.getId(),
         screenCount: this.screenManager.getAllScreens().size,
         agreementsAccepted,
+        needsOnboarding,
       });
     } catch (error) {
       logger.error('Failed to initialize application', error);
@@ -388,7 +408,27 @@ export class App extends Component {
       );
     }
 
-    return this.renderMainApp();
+    const mainApp = this.renderMainApp();
+
+    return (
+      <>
+        {mainApp}
+        
+        {/* Onboarding Tutorial */}
+        <OnboardingTutorial
+          visible={this.state.showOnboarding}
+          onComplete={() => this.setState({showOnboarding: false})}
+        />
+
+        {/* Toast Notifications */}
+        <Toast
+          visible={this.state.toastVisible}
+          message={this.state.toastMessage}
+          type={this.state.toastType}
+          onHide={() => this.setState({toastVisible: false})}
+        />
+      </>
+    );
   }
 
   /**
