@@ -226,7 +226,7 @@ const HomeScreen = () => {
   const handleConnect = async () => {
     try {
       haptic.light(); // Haptic feedback on button press
-      
+
       if (isConnected) {
         await DeviceManager.disconnect();
         setIsConnected(false);
